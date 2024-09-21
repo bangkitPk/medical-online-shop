@@ -115,12 +115,18 @@ function RegisterPage() {
         // simpan data user
         await setDoc(doc(db, "Users", user.uid), storedUserData);
       }
+      const authInfo = {
+        userID: user.uid,
+        isAuth: true,
+      };
+      localStorage.setItem("auth", JSON.stringify(authInfo));
+
       toast({
         title: "Anda Berhasil Mendaftar",
-        description: "Anda Akan Beralih ke Halaman Login",
+        description: "Anda Akan Beralih ke Beranda",
         variant: "success",
       });
-      setTimeout(() => navigate("/login"), 3500);
+      setTimeout(() => navigate("/"), 3500);
       console.log("User registered successfully", user);
       return user;
     } catch (error) {
