@@ -11,6 +11,33 @@ function HomePage() {
           Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
         </h1>
       </header>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
+      <h1 className="text-5xl w-1/2 font-bold text-primary">
+        Belanja Mudah, Aman, dan Berkualitas untuk Kesehatan Anda
+      </h1>
     </main>
   );
 }

@@ -19,7 +19,7 @@ import { auth, db } from "@/config/firebase.config";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { formSchema } from "@/utils/formValidation";
+import { formSchema } from "@/validation/registerFormValidation";
 import { z } from "zod";
 
 function RegisterPage() {
@@ -200,7 +200,7 @@ function RegisterPage() {
                 <div
                   className={`${
                     !formData.password && "hidden"
-                  } animate-slide-down transition-all`}
+                  } animate-scale-right`}
                 >
                   <Label
                     className={`flex items-center mb-1 gap-1 text-destructive ${

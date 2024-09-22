@@ -3,6 +3,10 @@ import illustration from "@/assets/images/illustration-1.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { loginUser } from "@/redux/slices/authSlice";
 // import { z } from "zod"
 
 // const formSchema = z.object({
@@ -10,6 +14,22 @@ import { Label } from "@/components/ui/label";
 // })
 
 function LoginPage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoading, error, user } = useSelector((state) => state.auth);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    dispatch(loginUser(formData))
+      .unwrap()
+      .then(() => navigate("/"))
+      .catch((err) => console.error("Login failed:", err));
+  };
+
   return (
     <main className="flex w-screen h-screen relative overflow-hidden">
       <div className="bg-gradient-to-r from-secondary to-[#a0391d] w-40 h-40 rounded-full absolute z-10 -top-8 -left-10"></div>
@@ -29,14 +49,26 @@ function LoginPage() {
           <h1 className="text-3xl font-bold mb-10">Masuk ke Akun Anda</h1>
 
           {/* FORM LOGIN */}
-          <form className="space-y-8 w-full">
+          <form className="space-y-8 w-full" onSubmit={handleSubmit}>
             <div>
               <Label>Email</Label>
-              <Input type="email" />
+              <Input
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
             </div>
             <div>
               <Label>Password</Label>
-              <Input type="password" />
+              <Input
+                type="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+              />
             </div>
             <Button type="submit" variant="outline" className="w-full">
               Masuk
