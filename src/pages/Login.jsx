@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { loginUser } from "@/redux/slices/authSlice";
+import { clearGuestToast } from "@/redux/slices/guestSlice";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 // import { z } from "zod"
 
 // const formSchema = z.object({
@@ -21,6 +24,18 @@ function LoginPage() {
     email: "",
     password: "",
   });
+
+  // guest toast (ketika dialihkan ke halaman login setelah menambah produk tanpa login)
+  const { toast } = useToast();
+  const guestToast = useSelector((state) => state.guest.guestToast);
+
+  useEffect(() => {
+    if (guestToast) {
+      console.log(guestToast);
+      toast(guestToast); // tampilkan pesan toast
+      dispatch(clearGuestToast()); // hapus toast dari state setelah ditampilkan
+    }
+  }, [guestToast, dispatch, toast]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,6 +91,7 @@ function LoginPage() {
           </form>
         </div>
       </div>
+      <Toaster />
     </main>
   );
 }

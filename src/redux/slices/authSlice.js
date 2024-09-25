@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/config/firebase.config";
 
-// Async action for login
+// Async action Login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
@@ -29,23 +29,20 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-export const logoutUser = createAsyncThunk(
-  "auth/logout",
-  async (_, { rejectWithValue }) => {
-    try {
-      await auth.signOut();
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
 const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
     isLoading: false,
     error: null,
+  },
+  reducers: {
+    setUser(state, action) {
+      state.user = action.payload;
+    },
+    logoutUser(state) {
+      state.user = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -61,21 +58,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       });
-
-    builder
-      .addCase(logoutUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.isLoading = false;
-        state.user = null;
-      })
-      .addCase(logoutUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      });
   },
 });
 
+export const { setUser, logoutUser } = authSlice.actions;
 export default authSlice.reducer;

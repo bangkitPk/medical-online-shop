@@ -7,7 +7,7 @@ import {
 
 export default function FilterSidebar() {
   return (
-    <div>
+    <div className="sticky top-[12px]">
       <span className="font-bold">Filter</span>
       <Accordion type="single" collapsible className="w-52 px-2">
         <AccordionItem value="item-1">

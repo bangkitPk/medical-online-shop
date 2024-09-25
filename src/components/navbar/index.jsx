@@ -5,10 +5,14 @@ import { NavLink } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/slices/authSlice";
+import { Button } from "../ui/button";
+import { auth } from "@/config/firebase.config";
+import { navLinks } from "./navLinks";
 
 function Navbar() {
   const navbar = useRef(null);
   const user = useSelector((state) => state.auth.user);
+  const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const scrollHandler = () => {
@@ -43,8 +47,15 @@ function Navbar() {
     return () => window.removeEventListener("scroll", scrollHandler);
   }, []);
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
+  const handleLogout = async () => {
+    // dispatch(logoutUser());
+
+    try {
+      await auth.signOut();
+      dispatch(logoutUser());
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   return (
@@ -53,26 +64,40 @@ function Navbar() {
       className="flex items-center justify-between w-full px-10 py-7 bg-background shadow-md"
     >
       <img src={logo} className="w-10" alt="logo" />
-      <NavLink
-        to="/"
-        style={({ isActive }) => {
-          return isActive ? { color: "plum" } : {};
-        }}
-      >
-        Beranda
-      </NavLink>
+      {navLinks.map((link) => (
+        <NavLink
+          key={link.key}
+          to={link.path}
+          style={({ isActive }) => {
+            return isActive ? { color: "plum" } : {};
+          }}
+          className="hover:bg-accent px-3 py-3"
+        >
+          {link.text}
+        </NavLink>
+      ))}
       <SearchInput />
-      <ShoppingCart />
+      <NavLink to="/keranjang" className="relative hover:bg-accent px-3 py-3">
+        {user && cart.products.length > 0 ? (
+          <>
+            <span className="bg-primary w-4 h-4 rounded-full text-xs flex items-center justify-center text-white absolute -top-1 -right-1">
+              {cart.products.length}
+              {console.log(cart.products)}
+            </span>
+          </>
+        ) : null}
+        <ShoppingCart />
+      </NavLink>
       <div className="flex items-center space-x-4">
         {user ? (
           <>
             <span>Welcome, {user.displayName}</span>
-            <button
+            <Button
               onClick={handleLogout}
-              className="px-3 py-2 rounded-md bg-red-500 text-white hover:bg-red-700"
+              className="px-3 py-2 rounded-md bg-destructive text-white hover:bg-destructive/70"
             >
               Logout
-            </button>
+            </Button>
           </>
         ) : (
           <>
