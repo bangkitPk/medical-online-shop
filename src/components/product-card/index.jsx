@@ -20,18 +20,20 @@ export default function ProductCard({
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user); // get current user
   const cart = useSelector((state) => state.cart);
-  const [inCart, setInCart] = useState(false);
+  const [inCart, setInCart] = useState();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     // cek apakah produk sudah ada di keranjang
-    const checkProductInCart = () => {
-      // console.log(cart.products);
-      setInCart(cart.products.some((item) => item.id === id));
-    };
-    if (user) checkProductInCart();
-    else return;
-  }, []);
+    // const checkProductInCart = () => {
+    //   // console.log(cart.products);
+    //   setInCart(cart.products.some((item) => item.id === id));
+    // };
+    if (!loading && user && cart.products) {
+      setInCart(cart.products.some((product) => product.id === id));
+    }
+  }, [cart, loading]);
 
   const handleAddToCart = () => {
     if (!user) {
@@ -45,14 +47,25 @@ export default function ProductCard({
       return;
     }
 
+    setInCart(true);
+    setLoading(true);
     const product = { id, namaProduk, deskripsi, harga, stok };
-    dispatch(addToCart({ userId: user.uid, product })).then(() => {
-      setInCart(true);
-    });
-    toast({
-      title: "Produk ditambahkan ke keranjang",
-      variant: "success",
-    });
+    dispatch(addToCart({ userId: user.uid, product }))
+      .then(() => {
+        setLoading(false); // Stop loading once the cart is updated
+        toast({
+          title: "Produk ditambahkan ke keranjang",
+          variant: "success",
+        });
+      })
+      .catch(() => {
+        setInCart(false); // Revert if adding fails
+        setLoading(false);
+      });
+    // toast({
+    //   title: "Produk ditambahkan ke keranjang",
+    //   variant: "success",
+    // });
   };
 
   const handleRemoveFromCart = () => {
@@ -63,14 +76,24 @@ export default function ProductCard({
       });
     }
 
-    dispatch(removeFromCart({ userId: user.uid, productId: id })).then(() => {
-      setInCart(false);
-    });
-
-    toast({
-      title: "Produk dihapus dari keranjang",
-      variant: "warning",
-    });
+    setInCart(false);
+    setLoading(true);
+    dispatch(removeFromCart({ userId: user.uid, productId: id }))
+      .then(() => {
+        setLoading(false); // Stop loading once the cart is updated
+        toast({
+          title: "Produk dihapus dari keranjang",
+          variant: "warning",
+        });
+      })
+      .catch(() => {
+        setInCart(true); // Revert if removing fails
+        setLoading(false);
+      });
+    // toast({
+    //   title: "Produk dihapus dari keranjang",
+    //   variant: "warning",
+    // });
   };
 
   return (

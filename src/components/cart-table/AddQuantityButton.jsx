@@ -1,20 +1,21 @@
-import { decreaseQuantity, increaseQuantity } from "@/redux/thunks/cartThunk";
+// import { decreaseQuantity, increaseQuantity } from "@/redux/thunks/cartThunk";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
+import { decreaseQuantity, increaseQuantity } from "@/redux/slices/cartSlice";
 
 export function AddQuantityButton({ product }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
   const handleAddQuantity = () => {
-    dispatch(increaseQuantity({ userId: user.uid, productId: product.id }));
+    dispatch(increaseQuantity({ productId: product.id }));
   };
 
   const handleDecreaseQuantity = () => {
     if (product.jumlah === 1) {
       return;
     }
-    dispatch(decreaseQuantity({ userId: user.uid, productId: product.id }));
+    dispatch(decreaseQuantity({ productId: product.id }));
   };
 
   return (

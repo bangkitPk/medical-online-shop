@@ -1,69 +1,10 @@
 // src/features/productSlice.js
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  limit,
-  startAfter,
-  getCountFromServer,
-} from "firebase/firestore";
-import { db } from "@/config/firebase.config";
-
-export const getTotalProducts = createAsyncThunk(
-  "products/getTotalProducts",
-  async (_, { rejectWithValue }) => {
-    try {
-      const coll = collection(db, "Produk");
-      const snapshot = await getCountFromServer(coll);
-      return snapshot.data().count;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const fetchProducts = createAsyncThunk(
-  "products/fetchProducts",
-  async ({ lastDoc }, { rejectWithValue }) => {
-    try {
-      let productQuery;
-      if (lastDoc) {
-        // Jika lastDoc ada, tambahkan startAfter untuk pagination
-        productQuery = query(
-          collection(db, "Produk"),
-          orderBy("namaProduk"),
-          limit(10),
-          startAfter(lastDoc)
-        );
-      } else {
-        // Jika lastDoc tidak ada (fetch pertama)
-        productQuery = query(
-          collection(db, "Produk"),
-          orderBy("namaProduk"),
-          limit(10)
-        );
-      }
-      const querySnapshot = await getDocs(productQuery);
-      const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-
-      const products = querySnapshot.docs.map((doc) => {
-        // map product data
-        const data = doc.data();
-
-        return {
-          id: doc.id,
-          ...data,
-        };
-      });
-
-      return { products, lastVisibleId: lastVisible ? lastVisible.id : null };
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+  fetchProducts,
+  getTotalProducts,
+  searchProducts,
+} from "../thunks/productThunks";
 
 const productSlice = createSlice({
   name: "products",
@@ -71,15 +12,32 @@ const productSlice = createSlice({
     items: [],
     lastDocId: null,
     totalProducts: 0,
+    searchedProducts: {
+      lastDocId: null,
+      total: 0,
+      items: [],
+    },
     isLoading: false,
     error: null,
   },
   reducers: {
-    resetProducts(state) {
+    clearAllProducts(state) {
       state.items = [];
       state.lastDocId = null;
+      state.searchedProducts = {
+        lastDoc: null,
+        total: 0,
+        items: [],
+      };
       state.error = null;
       state.isLoading = false;
+    },
+    clearSearchStates(state) {
+      state.searchedProducts = {
+        lastDocId: null,
+        total: 0,
+        items: [],
+      };
     },
   },
   extraReducers: (builder) => {
@@ -94,14 +52,30 @@ const productSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.isLoading = false;
         state.items = [...state.items, ...action.payload.products];
-        state.lastDocId = action.payload.lastVisibleId;
+        state.lastDocId = action.payload.lastDocId;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // search product actions
+      .addCase(searchProducts.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(searchProducts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.searchedProducts.items = action.payload.items;
+        state.searchedProducts.lastDocId = action.payload.lastDoc;
+        state.searchedProducts.total = action.payload.total;
+      })
+      .addCase(searchProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { resetProducts } = productSlice.actions;
+export const { clearAllProducts, clearSearchStates } = productSlice.actions;
 export default productSlice.reducer;

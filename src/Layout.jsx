@@ -5,7 +5,9 @@ function Layout() {
   return (
     <div>
       <Navbar />
-      <Outlet />
+      <div className="absolute top-0 pt-36 -z-50">
+        <Outlet />
+      </div>
     </div>
   );
 }

@@ -38,7 +38,7 @@ function HomePage() {
 
   return (
     <main>
-      <header className="w-full flex justify-center pt-14">
+      <header className="w-full flex justify-center">
         <Carousel
           plugins={[autoplay.current]}
           className="w-3/4 relative cursor-pointer"

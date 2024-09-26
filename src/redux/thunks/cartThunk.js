@@ -23,7 +23,7 @@ const fetchCart = createAsyncThunk(
       }
 
       const cartProducts = cartSnapshot.data().products || [];
-      const cartTotalBiaya = cartSnapshot.data().totalBiaya || 0;
+      const cartTotalBiaya = cartSnapshot.data().totalBiaya;
       return { cartProducts, cartTotalBiaya }; // kembalikan data keranjang
     } catch (error) {
       return rejectWithValue(error.message);
@@ -48,36 +48,43 @@ const addToCart = createAsyncThunk(
         total: totalPrice,
       };
 
-      const cartRef = doc(db, "Keranjang", userId);
-
       // cek apakah sudah ada keranjang dengan id user userId
+      const cartRef = doc(db, "Keranjang", userId);
       const docSnapshot = await getDoc(cartRef);
 
       if (!docSnapshot.exists()) {
         // jika belum, buat dokumen baru
         await setDoc(cartRef, {
           products: arrayUnion(productToAdd), // produk pertama
-          // totalBiaya: productToAdd.total,
+          totalBiaya: productToAdd.total,
         });
 
         // kembalikan payload
+
+        // is this object return will be the payload?
+        return productToAdd;
       }
 
-      // jika sudah ada, ambil total biaya keranjang
-      // const currentTotalBiaya = docSnapshot.data().totalBiaya || 0;
+      // jika sudah ada dokumen cart/keranjang dengan id user yang dimaksud, ambil field total biaya dokumen keranjang tersebut
+      const currentTotalBiaya = docSnapshot.data().totalBiaya || 0;
 
+      // console.log("Total biaya lama: " + currentTotalBiaya);
       // update keranjang
-      await updateDoc(cartRef, {
-        products: arrayUnion(productToAdd),
-        // totalBiaya: currentTotalBiaya + productToAdd.total, // tambahkan harga produk baru ke totalBiaya
-      });
-      // currentTotalBiaya += productToAdd.total;
+      try {
+        await updateDoc(cartRef, {
+          products: arrayUnion(productToAdd),
+          totalBiaya: currentTotalBiaya + productToAdd.total, // tambahkan harga produk baru dengan current totalBiaya
+        });
+        console.log("UpdateDoc successful");
+      } catch (error) {
+        console.error("Error updating document: ", error);
+        return rejectWithValue(error.message);
+      }
 
-      // return {
-      //   productToAdd,
-      //   totalBiaya: currentTotalBiaya,
-      // }; // kembalikan payload
-      return productToAdd;
+      const newTotalBiaya = currentTotalBiaya + productToAdd.total;
+      // console.log("Total biaya baru: " + newTotalBiaya);
+      return productToAdd; // kembalikan payload
+      // return productToAdd;
     } catch (error) {
       return rejectWithValue(error.message);
     }

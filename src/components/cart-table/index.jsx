@@ -14,7 +14,7 @@ import { RemoveProductButton } from "./RemoveProductButton";
 import { displayMoney } from "@/helpers/displayMoney";
 
 export default function CartTable() {
-  const cart = useSelector((state) => state.cart.products);
+  const cartProducts = useSelector((state) => state.cart.products);
 
   return (
     <div className="w-3/4 shadow-lg rounded-lg overflow-y-auto h-80">
@@ -28,8 +28,8 @@ export default function CartTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {cart.length > 0
-            ? cart.map((item) => (
+          {cartProducts.length > 0
+            ? cartProducts.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">
                     <ProductCell produk={item} />

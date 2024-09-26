@@ -12,7 +12,7 @@ import { navLinks } from "./navLinks";
 function Navbar() {
   const navbar = useRef(null);
   const user = useSelector((state) => state.auth.user);
-  const cart = useSelector((state) => state.cart);
+  const cartProducts = useSelector((state) => state.cart.products);
   const dispatch = useDispatch();
 
   const scrollHandler = () => {
@@ -78,11 +78,10 @@ function Navbar() {
       ))}
       <SearchInput />
       <NavLink to="/keranjang" className="relative hover:bg-accent px-3 py-3">
-        {user && cart.products.length > 0 ? (
+        {user && cartProducts.length > 0 ? (
           <>
             <span className="bg-primary w-4 h-4 rounded-full text-xs flex items-center justify-center text-white absolute -top-1 -right-1">
-              {cart.products.length}
-              {console.log(cart.products)}
+              {cartProducts.length}
             </span>
           </>
         ) : null}

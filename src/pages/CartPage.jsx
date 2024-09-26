@@ -7,7 +7,7 @@ function CartPage() {
   const cart = useSelector((state) => state.cart);
   const diskon = 0;
   return (
-    <div className="py-10 px-10">
+    <div className="w-screen py-10 px-10">
       <h1 className="text-3xl font-black">Keranjang Belanja</h1>
       <p className="mb-10">
         <b>{cart.products.length} produk</b> di keranjang Anda
