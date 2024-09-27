@@ -44,6 +44,7 @@ const productSlice = createSlice({
     builder
       .addCase(getTotalProducts.fulfilled, (state, action) => {
         state.totalProducts = action.payload;
+        console.log("Total produk semua: " + state.totalProducts);
       })
       .addCase(fetchProducts.pending, (state) => {
         state.isLoading = true;
@@ -66,9 +67,13 @@ const productSlice = createSlice({
       })
       .addCase(searchProducts.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.searchedProducts.items = action.payload.items;
-        state.searchedProducts.lastDocId = action.payload.lastDoc;
+        state.searchedProducts.items = [
+          ...state.searchedProducts.items,
+          ...action.payload.items,
+        ];
+        state.searchedProducts.lastDocId = action.payload.lastDocId;
         state.searchedProducts.total = action.payload.total;
+        console.log("Total produk yg dicari: " + state.searchedProducts.total);
       })
       .addCase(searchProducts.rejected, (state, action) => {
         state.isLoading = false;

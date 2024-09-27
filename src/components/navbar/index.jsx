@@ -25,7 +25,8 @@ function Navbar() {
           "top-0",
           "animate-slide-down",
           "fill-mode-forwards",
-          "py-3"
+          "py-3",
+          "shadow-md"
         );
       } else {
         navbar.current.classList.remove(
@@ -34,7 +35,8 @@ function Navbar() {
           "top-0",
           "animate-slide-down",
           "fill-mode-forwards",
-          "py-3"
+          "py-3",
+          "shadow-md"
         );
         navbar.current.classList.add("py-7");
       }
@@ -61,7 +63,7 @@ function Navbar() {
   return (
     <nav
       ref={navbar}
-      className="flex items-center justify-between w-full px-10 py-7 bg-background shadow-md"
+      className="flex items-center justify-between w-full px-10 py-7 bg-background"
     >
       <img src={logo} className="w-10" alt="logo" />
       {navLinks.map((link) => (

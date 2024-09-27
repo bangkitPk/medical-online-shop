@@ -14,6 +14,7 @@ import { auth } from "./config/firebase.config.js";
 import { setUser } from "./redux/slices/authSlice.js";
 import BelanjaPage from "./pages/BelanjaPage.jsx";
 import { fetchCart } from "./redux/thunks/cartThunk.js";
+import { SeedingProducts } from "./seeding/seedingProducts.js";
 
 const routes = createBrowserRouter([
   {
@@ -39,7 +40,7 @@ const routes = createBrowserRouter([
 
 function App() {
   const dispatch = useDispatch();
-
+  // SeedingProducts();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {

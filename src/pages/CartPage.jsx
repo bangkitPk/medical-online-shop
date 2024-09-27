@@ -2,10 +2,16 @@ import CartTable from "@/components/cart-table";
 import { Button } from "@/components/ui/button";
 import { displayMoney } from "@/helpers/displayMoney";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function CartPage() {
   const cart = useSelector((state) => state.cart);
   const diskon = 0;
+  const navigate = useNavigate();
+
+  function handleCheckout() {
+    navigate("/keranjang/pembayaran");
+  }
   return (
     <div className="w-screen py-10 px-10">
       <h1 className="text-3xl font-black">Keranjang Belanja</h1>
@@ -29,7 +35,7 @@ function CartPage() {
             <p>{displayMoney(cart.totalBiaya - diskon)}</p>
           </div>
           <div className="flex justify-center mt-10">
-            <Button>Checkout</Button>
+            <Button onClick={handleCheckout}>Checkout</Button>
           </div>
         </div>
       </div>

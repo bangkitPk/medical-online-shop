@@ -35,7 +35,7 @@ export const fetchProducts = createAsyncThunk(
         productQuery = query(
           collection(db, "Produk"),
           orderBy("namaProduk"),
-          limit(10),
+          limit(12),
           startAfter(lastDoc)
         );
       } else {
@@ -43,7 +43,7 @@ export const fetchProducts = createAsyncThunk(
         productQuery = query(
           collection(db, "Produk"),
           orderBy("namaProduk"),
-          limit(10)
+          limit(12)
         );
       }
       const querySnapshot = await getDocs(productQuery);
@@ -68,18 +68,40 @@ export const fetchProducts = createAsyncThunk(
 
 export const searchProducts = createAsyncThunk(
   "products/searchProducts",
-  async (searchKey, { rejectWithValue }) => {
+  async ({ lastDoc, searchKey }, { rejectWithValue }) => {
     try {
       clearSearchStates();
       const searchKeyLower = searchKey.toLowerCase();
       console.log("Searching for products with key:", searchKey);
       const productsRef = collection(db, "Produk");
-      const productQuery = query(
+
+      // Query untuk menghitung semua produk yang dicari
+      const totalCountQuery = query(
         productsRef,
-        where("namaProduk_lower", ">=", searchKeyLower),
-        where("namaProduk_lower", "<=", `${searchKeyLower}\uf8ff`),
-        limit(10)
+        where("namaProduk_lowercase", ">=", searchKeyLower),
+        where("namaProduk_lowercase", "<=", `${searchKeyLower}\uf8ff`)
       );
+      const totalSnapshot = await getDocs(totalCountQuery);
+      const totalProducts = totalSnapshot.size;
+
+      // query untuk limit produk (pagination)
+      let productQuery;
+      if (lastDoc) {
+        productQuery = query(
+          productsRef,
+          where("namaProduk_lowercase", ">=", searchKeyLower),
+          where("namaProduk_lowercase", "<=", `${searchKeyLower}\uf8ff`),
+          limit(12),
+          startAfter(lastDoc) // cari setelah dokumen terakhir pada pemanggilan sebelumnya
+        );
+      } else {
+        productQuery = query(
+          productsRef,
+          where("namaProduk_lowercase", ">=", searchKeyLower),
+          where("namaProduk_lowercase", "<=", `${searchKeyLower}\uf8ff`),
+          limit(12)
+        );
+      }
 
       const snapshot = await getDocs(productQuery);
       console.log("Snapshot fetched:", snapshot.docs.length);
@@ -104,7 +126,7 @@ export const searchProducts = createAsyncThunk(
       return {
         items: products,
         lastDocId: lastVisibleDoc ? lastVisibleDoc.id : null,
-        total: snapshot.size,
+        total: totalProducts,
       };
     } catch (error) {
       console.error("Error searching products:", error.message);

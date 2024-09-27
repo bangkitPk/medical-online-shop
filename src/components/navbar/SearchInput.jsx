@@ -7,13 +7,23 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export function SearchInput() {
   const dispatch = useDispatch();
-  const [searchKey, setSearchKey] = useState("");
   const searchedProducts = useSelector(
     (state) => state.products.searchedProducts.items
   );
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  const searchParams = new URLSearchParams(location.search);
+  const searchKeyParam = searchParams.get("search");
+
+  const [searchKey, setSearchKey] = useState(searchKeyParam || "");
+
+  useEffect(() => {
+    if (searchKeyParam) {
+      setSearchKey(searchKeyParam);
+    }
+  }, [searchKeyParam]);
 
   useEffect(() => {
     if (searchedProducts.length > 0) {
@@ -22,15 +32,15 @@ export function SearchInput() {
   }, [searchedProducts]);
 
   const handleSearch = (e) => {
-    if (e.key == "Enter") {
-      // jika halaman bukan di halaman belanja, maka arahkan ke halaman belanja
-      if (searchKey != "") {
+    if (e.key === "Enter") {
+      if (searchKey !== "") {
         navigate(`/belanja?search=${searchKey}`);
       } else {
-        return;
+        navigate(`/belanja`);
       }
     }
   };
+
   return (
     <div className="flex h-10 w-1/2 items-center rounded-2xl border border-ring bg-white pl-3 text-sm ring-offset-u focus-within:ring-1 focus-within:ring-primary">
       <Search />
