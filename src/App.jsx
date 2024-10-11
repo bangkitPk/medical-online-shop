@@ -7,7 +7,7 @@ import SearchProductPage from "./pages/SearchProductPage";
 import CartPage from "./pages/CartPage";
 import PaymentPage from "./pages/PaymentPage";
 import Layout from "./Layout.jsx";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./config/firebase.config.js";
@@ -15,6 +15,8 @@ import { setUser } from "./redux/slices/authSlice.js";
 import BelanjaPage from "./pages/BelanjaPage.jsx";
 import { fetchCart } from "./redux/thunks/cartThunk.js";
 import { SeedingProducts } from "./seeding/seedingProducts.js";
+import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
+import { fetchOrder } from "./redux/thunks/orderThunk.js";
 
 const routes = createBrowserRouter([
   {
@@ -26,6 +28,7 @@ const routes = createBrowserRouter([
       { path: "/cari-produk", element: <SearchProductPage /> },
       { path: "/keranjang", element: <CartPage /> },
       { path: "/keranjang/pembayaran", element: <PaymentPage /> },
+      { path: "/pesanan", element: <OrderHistoryPage /> },
     ],
   },
   {
@@ -53,6 +56,7 @@ function App() {
         };
         dispatch(setUser(userData));
         dispatch(fetchCart(user.uid));
+        dispatch(fetchOrder(user.uid));
       } else {
         dispatch(setUser(null));
       }

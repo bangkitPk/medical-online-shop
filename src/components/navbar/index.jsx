@@ -1,53 +1,107 @@
 import logo from "@/assets/images/logo.svg";
 import { SearchInput } from "./SearchInput";
-import { ShoppingCart } from "lucide-react";
-import { NavLink } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { User, LogOut, ShoppingCart, CreditCard } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/redux/slices/authSlice";
 import { Button } from "../ui/button";
 import { auth } from "@/config/firebase.config";
 import { navLinks } from "./navLinks";
+import { resetCart } from "@/redux/slices/cartSlice";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 function Navbar() {
+  const [prevScrollPos, setPrevScrollPos] = useState(window.pageYOffset);
+  const [hide, setHide] = useState(false);
+  const [onTop, setOnTop] = useState(true);
   const navbar = useRef(null);
   const user = useSelector((state) => state.auth.user);
   const cartProducts = useSelector((state) => state.cart.products);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const scrollHandler = () => {
-    if (navbar.current && window.screen.width > 480) {
-      if (window.pageYOffset >= 70) {
-        navbar.current.classList.remove("py-7");
-        navbar.current.classList.add(
-          "fixed",
-          "z-50",
-          "top-0",
-          "animate-slide-down",
-          "fill-mode-forwards",
-          "py-3",
-          "shadow-md"
-        );
-      } else {
-        navbar.current.classList.remove(
-          "fixed",
-          "z-50",
-          "top-0",
-          "animate-slide-down",
-          "fill-mode-forwards",
-          "py-3",
-          "shadow-md"
-        );
-        navbar.current.classList.add("py-7");
-      }
+  // const scrollHandler = () => {
+  //   if (navbar.current && window.screen.width > 480) {
+  //     if (window.pageYOffset >= 70) {
+  //       navbar.current.classList.remove("py-7");
+  //       navbar.current.classList.add(
+  //         "fixed",
+  //         "z-50",
+  //         "top-0",
+  //         "animate-slide-down",
+  //         "fill-mode-forwards",
+  //         "py-3",
+  //         "shadow-md"
+  //       );
+  //     } else {
+  //       navbar.current.classList.remove(
+  //         "fixed",
+  //         "z-50",
+  //         "top-0",
+  //         "animate-slide-down",
+  //         "fill-mode-forwards",
+  //         "py-3",
+  //         "shadow-md"
+  //       );
+  //       navbar.current.classList.add("py-7");
+  //     }
+  //   }
+  // };
+
+  const handleScroll = () => {
+    const currentScrollPos = window.pageYOffset;
+
+    if (currentScrollPos === 0) {
+      // At the top of the page, reset to original state with no animation
+      navbar.current.classList.remove(
+        "animate-slide-up",
+        "animate-slide-down",
+        "fill-mode-forwards",
+        "fixed",
+        "top-0",
+        "z-50",
+        "shadow-md",
+        "py-3"
+      );
+      navbar.current.classList.add("py-7");
+    } else if (prevScrollPos > currentScrollPos && currentScrollPos > 70) {
+      // Scrolling up, show navbar with animation
+      navbar.current.classList.add(
+        "fixed",
+        "top-0",
+        "z-50",
+        "shadow-md",
+        "animate-slide-down",
+        "fill-mode-forwards",
+        "py-3"
+      );
+      navbar.current.classList.remove("animate-slide-up", "py-7");
+    } else if (prevScrollPos < currentScrollPos && currentScrollPos > 70) {
+      // Scrolling down, hide navbar with animation
+      navbar.current.classList.add("animate-slide-up");
+      navbar.current.classList.remove(
+        "animate-slide-down",
+        "py-7",
+        "shadow-md"
+      );
     }
+
+    setPrevScrollPos(currentScrollPos);
   };
 
   useEffect(() => {
-    window.addEventListener("scroll", scrollHandler);
-    scrollHandler();
-    return () => window.removeEventListener("scroll", scrollHandler);
-  }, []);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [prevScrollPos]);
 
   const handleLogout = async () => {
     // dispatch(logoutUser());
@@ -55,6 +109,7 @@ function Navbar() {
     try {
       await auth.signOut();
       dispatch(logoutUser());
+      dispatch(resetCart());
     } catch (error) {
       console.error(error.message);
     }
@@ -63,7 +118,7 @@ function Navbar() {
   return (
     <nav
       ref={navbar}
-      className="flex items-center justify-between w-full px-10 py-7 bg-background"
+      className={`flex items-center justify-between w-full px-10 py-7 bg-background`}
     >
       <img src={logo} className="w-10" alt="logo" />
       {navLinks.map((link) => (
@@ -92,13 +147,44 @@ function Navbar() {
       <div className="flex items-center space-x-4">
         {user ? (
           <>
-            <span>Welcome, {user.displayName}</span>
-            <Button
+            {/* <span>Welcome, {user.displayName}</span> */}
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar>
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigate("/pesanan")}
+                >
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  <span>Riwayat Pesanan</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer bg-destructive text-destructive-foreground"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* <Button
               onClick={handleLogout}
               className="px-3 py-2 rounded-md bg-destructive text-white hover:bg-destructive/70"
             >
               Logout
-            </Button>
+            </Button> */}
           </>
         ) : (
           <>

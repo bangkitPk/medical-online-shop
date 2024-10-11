@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { decreaseQuantity, increaseQuantity } from "@/redux/slices/cartSlice";
 
-export function AddQuantityButton({ product }) {
+export function EditQuantityButton({ product }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  const cart = useSelector((state) => state.cart);
 
   const handleAddQuantity = () => {
     dispatch(increaseQuantity({ productId: product.id }));
+    console.log(cart.products);
   };
 
   const handleDecreaseQuantity = () => {

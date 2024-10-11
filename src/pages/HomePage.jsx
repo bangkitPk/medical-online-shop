@@ -44,7 +44,7 @@ function HomePage() {
           className="w-3/4 relative cursor-pointer"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          autoplayRef={autoplay}
+          autoplayref={autoplay}
         >
           <CarouselContent>
             {headerTexts.map((text, index) => (

@@ -101,7 +101,6 @@ function RegisterPage() {
       );
       const user = userCredential.user;
 
-      // pilih data user yang disimpan di database
       const storedUserData = {
         nama: formData.nama,
         email: formData.email,

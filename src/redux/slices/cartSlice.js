@@ -1,17 +1,50 @@
 // src/features/cartSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { addToCart, fetchCart, removeFromCart } from "../thunks/cartThunk";
+import {
+  addToCart,
+  fetchCart,
+  removeFromCart,
+  updateCart,
+} from "../thunks/cartThunk";
 
 // Redux slice
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
     products: [],
+    selectedProducts: [],
     totalBiaya: 0,
     isLoading: false,
     error: null,
   },
   reducers: {
+    resetCart(state) {
+      state.products = [];
+      state.selectedProducts = [];
+      state.totalBiaya = 0;
+      state.isLoading = false;
+      state.error = null;
+    },
+    addToCart(state, action) {
+      const { userId, product, quantity } = action.payload;
+      const existingProductIndex = state.products.findIndex(
+        (p) => p.idProduk === product.id
+      );
+
+      if (existingProductIndex === -1) {
+        const totalBiayaProduk = quantity * product.harga;
+        const productToAdd = {
+          idProduk: product.id,
+          namaProduk: product.namaProduk,
+          harga: product.harga,
+          jumlah: quantity,
+          total: totalBiayaProduk,
+        };
+
+        state.products = [...state.products, productToAdd];
+        state.totalBiaya += totalBiayaProduk;
+      }
+    },
     increaseQuantity(state, action) {
       const { productId } = action.payload;
 
@@ -19,12 +52,18 @@ const cartSlice = createSlice({
       const existingProduct = state.products.find(
         (product) => product.id === productId
       );
+      const isProductSelected = state.selectedProducts.find(
+        (product) => product.id === productId
+      );
 
-      // jika produk ada, update jjumlah
+      // jika produk ada, update jumlah
       if (existingProduct) {
         existingProduct.jumlah += 1;
         existingProduct.total += existingProduct.harga;
-        state.totalBiaya += existingProduct.harga;
+        if (isProductSelected) {
+          // jika produk dipilih, update totalBiaya
+          state.totalBiaya += existingProduct.harga;
+        }
       }
     },
     decreaseQuantity(state, action) {
@@ -34,13 +73,49 @@ const cartSlice = createSlice({
       const existingProduct = state.products.find(
         (product) => product.id === productId
       );
+      const isProductSelected = state.selectedProducts.find(
+        (product) => product.id === productId
+      );
 
       // jika produk ada, update jjumlah
       if (existingProduct && existingProduct.jumlah > 1) {
         existingProduct.jumlah -= 1;
         existingProduct.total -= existingProduct.harga;
-        state.totalBiaya -= existingProduct.harga;
+        if (isProductSelected) {
+          // jika produk dipilih, update totalBiaya
+          state.totalBiaya -= existingProduct.harga;
+        }
       }
+    },
+    removeProduct(state, action) {
+      const { productId } = action.payload;
+
+      // hapus produk dari keranjang
+      state.products = state.products.filter(
+        (product) => product.id !== productId
+      );
+    },
+    setSelectedProducts(state, action) {
+      const { product, allProducts } = action.payload;
+
+      if (allProducts !== undefined) {
+        state.selectedProducts = allProducts ? [...state.products] : [];
+      } else {
+        let productIndex = state.selectedProducts.findIndex(
+          (p) => p.id === product.id
+        );
+
+        if (productIndex > -1) {
+          state.selectedProducts.splice(productIndex, 1);
+        } else {
+          state.selectedProducts.push(product);
+        }
+      }
+      // update total biaya
+      state.totalBiaya = state.selectedProducts.reduce(
+        (total, item) => total + item.harga * item.jumlah,
+        0
+      );
     },
   },
   extraReducers: (builder) => {
@@ -52,10 +127,7 @@ const cartSlice = createSlice({
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.isLoading = false;
         state.products = action.payload.cartProducts;
-        state.totalBiaya += action.payload.cartTotalBiaya;
-        console.log("State pertama: ");
-        console.log(state.products);
-        console.log(state.totalBiaya);
+        // console.log("State pertama: ");
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.isLoading = false;
@@ -67,14 +139,12 @@ const cartSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(addToCart.fulfilled, (state, action) => {
-        const productToAdd = action.payload;
+        const productAdded = action.payload;
 
         state.isLoading = false;
-        state.products = [...state.products, productToAdd];
-        state.totalBiaya += productToAdd.total;
-        console.log("State updated:");
-        console.log(state.products);
-        console.log(state.totalBiaya);
+        state.products = [...state.products, productAdded];
+        state.selectedProducts = [...state.selectedProducts, productAdded];
+        state.totalBiaya += productAdded.total;
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.isLoading = false;
@@ -86,32 +156,35 @@ const cartSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.isLoading = false;
+        const productId = action.payload;
+
         state.products = state.products.filter(
-          (product) => product.id !== action.payload.product.id
+          (product) => product.id !== productId
         );
-        state.totalBiaya = action.payload.totalBiaya;
-        console.log("State updated:");
-        console.log(state.products);
-        console.log(state.totalBiaya);
+
+        state.selectedProducts = [];
+
+        state.totalBiaya = state.selectedProducts.reduce(
+          (total, item) => total + item.harga * item.jumlah,
+          0
+        );
       })
       .addCase(removeFromCart.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
 
-    // case tambah jumlah produk
-    // .addCase(increaseQuantity.pending, (state) => {
+    // case update jumlah produk
+    // .addCase(updateCart.pending, (state) => {
     //   state.isLoading = true;
     // })
-    // .addCase(increaseQuantity.fulfilled, (state, action) => {
+    // .addCase(updateCart.fulfilled, (state, action) => {
     //   state.isLoading = false;
-    //   state.products = action.payload;
     // })
-    // .addCase(increaseQuantity.rejected, (state, action) => {
+    // .addCase(updateCart.rejected, (state, action) => {
     //   state.isLoading = false;
     //   state.error = action.payload;
-    // })
+    // });
 
     // case mengurangi jumlah produk
     // .addCase(decreaseQuantity.pending, (state) => {
@@ -128,5 +201,11 @@ const cartSlice = createSlice({
   },
 });
 
-export const { increaseQuantity, decreaseQuantity } = cartSlice.actions;
+export const {
+  increaseQuantity,
+  decreaseQuantity,
+  resetCart,
+  removeProduct,
+  setSelectedProducts,
+} = cartSlice.actions;
 export default cartSlice.reducer;

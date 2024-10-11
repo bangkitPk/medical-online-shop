@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { displayMoney } from "@/helpers/displayMoney";
 import { useNavigate } from "react-router-dom";
 import { setGuestToast } from "@/redux/slices/guestSlice";
+import CartDialog from "../cart-dialog";
+import { ShoppingCart } from "lucide-react";
 
 export default function ProductCard({
   id,
@@ -15,6 +17,8 @@ export default function ProductCard({
   deskripsi,
   harga,
   stok,
+  idToko,
+  kategori,
 }) {
   const { toast } = useToast();
   const dispatch = useDispatch();
@@ -32,10 +36,12 @@ export default function ProductCard({
     // };
     if (!loading && user && cart.products) {
       setInCart(cart.products.some((product) => product.id === id));
+    } else {
+      setInCart(false);
     }
   }, [cart, loading]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (productQuantity) => {
     if (!user) {
       dispatch(
         setGuestToast({
@@ -46,20 +52,21 @@ export default function ProductCard({
       navigate("/login");
       return;
     }
-
-    setInCart(true);
     setLoading(true);
-    const product = { id, namaProduk, deskripsi, harga, stok };
-    dispatch(addToCart({ userId: user.uid, product }))
+    const product = { id, namaProduk, deskripsi, harga, stok, idToko };
+    dispatch(
+      addToCart({ userId: user.uid, product, quantity: productQuantity })
+    )
       .then(() => {
-        setLoading(false); // Stop loading once the cart is updated
+        setInCart(true);
+        setLoading(false);
         toast({
           title: "Produk ditambahkan ke keranjang",
           variant: "success",
         });
       })
       .catch(() => {
-        setInCart(false); // Revert if adding fails
+        setInCart(false);
         setLoading(false);
       });
     // toast({
@@ -75,12 +82,11 @@ export default function ProductCard({
         variant: "success",
       });
     }
-
     setInCart(false);
     setLoading(true);
     dispatch(removeFromCart({ userId: user.uid, productId: id }))
       .then(() => {
-        setLoading(false); // Stop loading once the cart is updated
+        setLoading(false);
         toast({
           title: "Produk dihapus dari keranjang",
           variant: "warning",
@@ -97,44 +103,49 @@ export default function ProductCard({
   };
 
   return (
-    <div className="w-full max-w-52">
+    <div className="w-full max-w-52 cursor-pointer group">
       <Toaster />
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-950">
-        <img
-          src={heroImage}
-          alt="Product Image"
-          // width={600}
-          // height={400}
-          className="w-full object-cover aspect-square"
-        />
-        <div className="p-2">
+      <div
+        className={`${
+          inCart && "border-black"
+        } border overflow-hidden transition-all duration-300 hover:shadow-xl dark:bg-gray-950 relative`}
+      >
+        <div className="bg-muted w-full group-hover:scale-y-90 origin-top transition-all ease-in-out duration-300 ">
+          <img
+            src={heroImage}
+            alt="Product Image"
+            // width={600}
+            // height={400}
+            className="w-full object-cover aspect-square group-hover:scale-90 origin-top transition-all ease-in-out duration-300"
+          />
+        </div>
+        {inCart && (
+          <ShoppingCart
+            size={16}
+            className="absolute top-2 right-2 text-success"
+          />
+        )}
+        <div className="p-2 translate-y-1/3 group-hover:translate-y-0 transition-all duration-300 ease-in">
           <h3 className="font-semibold truncate">{namaProduk}</h3>
           <p className="text-gray-500 dark:text-gray-400 text-xs">
             Toko Medis Jaya Sehat
           </p>
           <span className="font-bold">{displayMoney(harga)}</span>
-          <div className="flex flex-col items-center justify-between gap-2 mt-2">
-            <Button className="w-full" variant="secondary">
+        </div>
+        <div className="flex flex-col items-center justify-between gap-2 mt-2">
+          {/* <Button className="w-full" variant="secondary">
               Lihat
+            </Button> */}
+          {!inCart ? (
+            <CartDialog inCart={inCart} onSubmit={handleAddToCart} />
+          ) : (
+            <Button
+              onClick={handleRemoveFromCart}
+              className="w-full translate-y-full group-hover:translate-y-0 rounded-none transition-all ease-in duration-300"
+            >
+              Hapus dari Keranjang
             </Button>
-            {!inCart ? (
-              <Button
-                className="w-full"
-                variant="outline"
-                onClick={handleAddToCart}
-              >
-                Tambah ke Keranjang
-              </Button>
-            ) : (
-              <Button
-                className="w-full"
-                variant="outline"
-                onClick={handleRemoveFromCart}
-              >
-                Hapus dari Keranjang
-              </Button>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>
