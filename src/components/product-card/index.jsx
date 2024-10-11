@@ -18,6 +18,7 @@ export default function ProductCard({
   harga,
   stok,
   idToko,
+  toko,
   kategori,
 }) {
   const { toast } = useToast();
@@ -53,7 +54,7 @@ export default function ProductCard({
       return;
     }
     setLoading(true);
-    const product = { id, namaProduk, deskripsi, harga, stok, idToko };
+    const product = { id, namaProduk, deskripsi, harga, stok, idToko, toko };
     dispatch(
       addToCart({ userId: user.uid, product, quantity: productQuantity })
     )
@@ -128,7 +129,7 @@ export default function ProductCard({
         <div className="p-2 translate-y-1/3 group-hover:translate-y-0 transition-all duration-300 ease-in">
           <h3 className="font-semibold truncate">{namaProduk}</h3>
           <p className="text-gray-500 dark:text-gray-400 text-xs">
-            Toko Medis Jaya Sehat
+            {toko.namaToko}
           </p>
           <span className="font-bold">{displayMoney(harga)}</span>
         </div>

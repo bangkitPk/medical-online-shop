@@ -8,8 +8,17 @@ export default function OrdersList() {
     <div className="w-full flex flex-col gap-5">
       {userOrders.filteredOrders?.map((order) => (
         <div key={order.id} className="bg-white shadow-md p-5">
-          <div>
-            <span className="text-primary">{order.status.toUpperCase()}</span>
+          <div className="flex justify-between items-center">
+            <div>
+              <p>
+                Toko:{" "}
+                <span className="text-primary">
+                  {order.produk.toko.namaToko}
+                </span>
+              </p>
+              <p className="text-sm">{order.createdAt}</p>
+            </div>
+            <p className="text-primary">{order.status.toUpperCase()}</p>
           </div>
           <hr className="my-1" />
           <div className="flex items-center justify-between ">

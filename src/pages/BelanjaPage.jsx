@@ -91,6 +91,7 @@ function BelanjaPage() {
                 harga={product.harga}
                 stok={product.stok}
                 idToko={product.idToko}
+                toko={product.toko}
               />
             ))}
           {searchedProducts.items.length > 0 &&
@@ -103,6 +104,7 @@ function BelanjaPage() {
                 harga={product.harga}
                 stok={product.stok}
                 idToko={product.idToko}
+                toko={product.toko}
               />
             ))}
           {products &&
@@ -115,6 +117,7 @@ function BelanjaPage() {
                 harga={product.harga}
                 stok={product.stok}
                 idToko={product.idToko}
+                toko={product.toko}
               />
             ))}
         </div>

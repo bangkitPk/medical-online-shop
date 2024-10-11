@@ -8,9 +8,28 @@ import {
   startAfter,
   getCountFromServer,
   where,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 import { clearFilterStates, clearSearchStates } from "../slices/productSlice";
+
+const tokoCache = {}; // cache toko untuk menghindari fetch ulang
+
+const getTokoData = async (idToko) => {
+  // ambil data toko yang menjual produk
+  if (tokoCache[idToko]) {
+    return tokoCache[idToko];
+  }
+  const tokoRef = doc(db, "Toko", idToko);
+  const tokoSnapshot = await getDoc(tokoRef);
+  if (tokoSnapshot.exists()) {
+    tokoCache[idToko] = tokoSnapshot.data(); // simpan ke cache
+    return tokoSnapshot.data();
+  } else {
+    return null;
+  }
+};
 
 export const getTotalProducts = createAsyncThunk(
   "products/getTotalProducts",
@@ -49,15 +68,24 @@ export const fetchProducts = createAsyncThunk(
       const querySnapshot = await getDocs(productQuery);
       const lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
 
-      const products = querySnapshot.docs.map((doc) => {
-        // map product data
-        const data = doc.data();
+      console.log("fetch produk berjalan");
+      const products = await Promise.all(
+        querySnapshot.docs.map(async (doc) => {
+          const productData = doc.data();
+          const tokoData = await getTokoData(productData.idToko); // ambil data toko
 
-        return {
-          id: doc.id,
-          ...data,
-        };
-      });
+          return {
+            id: doc.id,
+            toko: {
+              namaToko: tokoData?.namaToko || "Nama Toko Tidak Ditemukan",
+              lokasi: tokoData?.lokasi || "Lokasi Tidak Ditemukan",
+            },
+            ...productData,
+          };
+        })
+      );
+      console.log("fetch produk selesai");
+      console.log(products);
 
       return { products, lastDocId: lastVisibleDoc ? lastVisibleDoc.id : null };
     } catch (error) {
@@ -116,10 +144,24 @@ export const searchProducts = createAsyncThunk(
         };
       }
 
-      const products = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      console.log("search produk berjalan");
+      const products = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const productData = doc.data();
+          const tokoData = await getTokoData(productData.idToko); // ambil data toko
+
+          return {
+            id: doc.id,
+            toko: {
+              namaToko: tokoData?.namaToko || "Nama Toko Tidak Ditemukan",
+              lokasi: tokoData?.lokasi || "Lokasi Tidak Ditemukan",
+            },
+            ...productData,
+          };
+        })
+      );
+      console.log("search produk selesai");
+      console.log(products);
 
       const lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
 
@@ -168,10 +210,21 @@ export const filterProducts = createAsyncThunk(
 
       const snapshot = await getDocs(productQuery);
       const lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
-      const products = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const products = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const productData = doc.data();
+          const tokoData = await getTokoData(productData.idToko); // ambil data toko
+
+          return {
+            id: doc.id,
+            toko: {
+              namaToko: tokoData?.namaToko || "Nama Toko Tidak Ditemukan",
+              lokasi: tokoData?.lokasi || "Lokasi Tidak Ditemukan",
+            },
+            ...productData,
+          };
+        })
+      );
 
       return {
         items: products,

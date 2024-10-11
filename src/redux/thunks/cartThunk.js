@@ -40,9 +40,6 @@ const addToCart = createAsyncThunk(
       const totalBiaya = product.harga * quantity;
       // data produk yang ditambah ke keranjang
 
-      const tokoRef = doc(db, "Toko", product.idToko);
-      const tokoData = await getDoc(cartRef);
-
       const productToAdd = {
         id: product.id,
         namaProduk: product.namaProduk,
@@ -51,8 +48,7 @@ const addToCart = createAsyncThunk(
         total: totalBiaya,
         toko: {
           idToko: product.idToko,
-          namaToko: tokoData.namaToko,
-          lokasi: tokoData.lokasi,
+          ...product.toko,
         },
       };
 

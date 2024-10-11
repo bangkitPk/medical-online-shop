@@ -33,6 +33,7 @@ function PaymentPage() {
     metodePembayaran: "paypal",
   });
 
+  const [isLocationMismatch, setIsLocationMismatch] = useState(false);
   const { provinces, cities, fetchCities, loading, error } = useFetchRegions(); // Fetch regions
 
   useEffect(() => {
@@ -40,7 +41,10 @@ function PaymentPage() {
       navigate("/keranjang");
       return;
     }
-  }, []);
+
+    checkLocationMismatch();
+  }, [userCart.selectedProducts, formData.alamat["kota-kab"]]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -71,6 +75,15 @@ function PaymentPage() {
 
   const handleKotaChange = (cityId) => {
     handleAlamatChange("kota-kab", cityId);
+  };
+
+  const checkLocationMismatch = () => {
+    const buyerCity = formData.alamat["kota-kab"].toLowerCase();
+    const hasMismatch = userCart.selectedProducts.some(
+      (product) => product.toko.lokasi.toLowerCase() !== buyerCity
+    );
+
+    setIsLocationMismatch(hasMismatch);
   };
 
   const handleSubmit = async (e) => {
@@ -217,10 +230,12 @@ function PaymentPage() {
                 <RadioGroupItem value="paypal" id="option-one" />
                 <Label htmlFor="option-one">PayPal</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Bayar Langsung" id="option-two" />
-                <Label htmlFor="option-two">Bayar Langsung di Toko</Label>
-              </div>
+              {!isLocationMismatch && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Bayar Langsung" id="option-two" />
+                  <Label htmlFor="option-two">Bayar Langsung di Toko</Label>
+                </div>
+              )}
             </RadioGroup>
           </div>
         </form>

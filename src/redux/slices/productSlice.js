@@ -70,6 +70,7 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.items = [...state.items, ...action.payload.products];
         state.lastDocId = action.payload.lastDocId;
+        console.log(state.items);
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isLoading = false;
