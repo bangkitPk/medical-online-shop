@@ -1,7 +1,7 @@
 export const sendOrderReceipt = async (orderData, userEmail) => {
   try {
     console.log("Jalankan send order pdf");
-    const response = await fetch("http://localhost:3000/send-receipt", {
+    const response = await fetch(import.meta.env.VITE_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

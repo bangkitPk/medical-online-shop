@@ -4,12 +4,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAI49b_X7P4xJTXOgHn9cMbGk81cFWYt9Q",
-  authDomain: "health-online-shopping.firebaseapp.com",
-  projectId: "health-online-shopping",
-  storageBucket: "health-online-shopping.appspot.com",
-  messagingSenderId: "922578934423",
-  appId: "1:922578934423:web:8e44ac40d066ba5d3867d2",
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID,
 };
 
 // Initialize Firebase
