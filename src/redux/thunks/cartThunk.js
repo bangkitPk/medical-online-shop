@@ -35,11 +35,9 @@ const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ userId, product, quantity }, { rejectWithValue }) => {
     try {
-      // const quantity = 1; // default jumlah produk
-
       const totalBiaya = product.harga * quantity;
-      // data produk yang ditambah ke keranjang
 
+      // data produk yang ditambah ke keranjang
       const productToAdd = {
         id: product.id,
         namaProduk: product.namaProduk,
@@ -65,14 +63,10 @@ const addToCart = createAsyncThunk(
         return productToAdd;
       }
 
-      // jika sudah ada dokumen cart/keranjang dengan id user yang dimaksud, ambil field total biaya dokumen keranjang tersebut
-      // const currentTotalBiaya = docSnapshot.data().totalBiaya || 0;
-
       // update keranjang
       try {
         await updateDoc(cartRef, {
           products: arrayUnion(productToAdd),
-          // totalBiaya: currentTotalBiaya + productToAdd.total, // tambahkan harga produk baru dengan current totalBiaya
         });
         console.log("Update Cart successful");
       } catch (error) {
@@ -95,8 +89,8 @@ const updateCart = createAsyncThunk(
     try {
       const cartRef = doc(db, "Keranjang", userId);
 
+      // update produk dalam keranjang
       await updateDoc(cartRef, {
-        // update jumlah produk dalam keranjang dan total biaya
         products: products,
       });
 
@@ -111,67 +105,6 @@ const updateCart = createAsyncThunk(
   }
 );
 
-// menambah jumlah produk tertentu di keranjang
-const increaseQuantity = createAsyncThunk(
-  "cart/increaseQuantity",
-  async ({ userId, productId }, { rejectWithValue }) => {
-    try {
-      const cartRef = doc(db, "Keranjang", userId);
-      const cartSnapshot = await getDoc(cartRef);
-      const currentCart = cartSnapshot.data().products;
-
-      const updatedCart = currentCart.map((product) =>
-        product.id === productId
-          ? {
-              ...product,
-              jumlah: product.jumlah + 1,
-              total: product.harga * (product.jumlah + 1),
-            }
-          : product
-      );
-
-      await updateDoc(cartRef, {
-        products: updatedCart,
-      });
-
-      return updatedCart;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// mengurangi jumlah produk tertentu di keranjang
-const decreaseQuantity = createAsyncThunk(
-  "cart/decreaseQuantity",
-  async ({ userId, productId }, { rejectWithValue }) => {
-    try {
-      const cartRef = doc(db, "Keranjang", userId);
-      const cartSnapshot = await getDoc(cartRef);
-      const currentCart = cartSnapshot.data().products;
-
-      const updatedCart = currentCart.map((product) =>
-        product.id === productId && product.jumlah > 1
-          ? {
-              ...product,
-              jumlah: product.jumlah - 1,
-              total: product.harga * (product.jumlah - 1),
-            }
-          : product
-      );
-
-      await updateDoc(cartRef, {
-        products: updatedCart,
-      });
-
-      return updatedCart;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// const removeFromCart = createAsyncThunk(
 //   "cart/removeFromCart",
 //   async ({ userId, productId }, { rejectWithValue }) => {
 //     try {

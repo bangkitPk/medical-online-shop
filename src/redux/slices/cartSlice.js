@@ -177,31 +177,6 @@ const cartSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       });
-
-    // case update jumlah produk
-    // .addCase(updateCart.pending, (state) => {
-    //   state.isLoading = true;
-    // })
-    // .addCase(updateCart.fulfilled, (state, action) => {
-    //   state.isLoading = false;
-    // })
-    // .addCase(updateCart.rejected, (state, action) => {
-    //   state.isLoading = false;
-    //   state.error = action.payload;
-    // });
-
-    // case mengurangi jumlah produk
-    // .addCase(decreaseQuantity.pending, (state) => {
-    //   state.isLoading = true;
-    // })
-    // .addCase(decreaseQuantity.fulfilled, (state, action) => {
-    //   state.isLoading = false;
-    //   state.products = action.payload;
-    // })
-    // .addCase(decreaseQuantity.rejected, (state, action) => {
-    //   state.isLoading = false;
-    //   state.error = action.payload;
-    // });
   },
 });
 

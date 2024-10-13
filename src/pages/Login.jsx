@@ -42,7 +42,6 @@ function LoginPage() {
     dispatch(loginUser(formData))
       .unwrap()
       .then((userData) => {
-        // Store user ID and role in local storage
         const authInfo = {
           userID: userData.uid,
           role: userData.role,

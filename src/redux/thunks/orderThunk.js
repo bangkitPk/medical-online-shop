@@ -7,7 +7,6 @@ import {
   doc,
   getDocs,
   query,
-  Timestamp,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -42,6 +41,7 @@ export const fetchOrder = createAsyncThunk(
   }
 );
 
+// checkout atau menambah pesanan
 export const addOrder = createAsyncThunk(
   "order/addOrder",
   async (orderData, { rejectWithValue }) => {
@@ -53,9 +53,7 @@ export const addOrder = createAsyncThunk(
         createdAt: createdAtString,
       };
 
-      console.log("Proses manambah order....");
       const docRef = await addDoc(collection(db, "Order"), newOrder);
-      console.log("Proses manambah order selesai");
       return { id: docRef.id, ...newOrder };
     } catch (error) {
       console.error("Gagal menambah order:", error);
@@ -85,22 +83,3 @@ export const updateOrder = createAsyncThunk(
     }
   }
 );
-
-// Async thunk untuk mengedit order
-// export const editOrder = createAsyncThunk(
-//   "order/editOrder",
-//   async ({ orderId, updatedData }, { rejectWithValue }) => {
-//     try {
-//  const updatedAtString = formatDate(new Date());
-//       const orderRef = doc(db, "Order", orderId);
-//       await updateDoc(orderRef, {
-//         ...updatedData,
-//         updatedAt: updatedAtString,
-//       });
-
-//       return { orderId, updatedData };
-//     } catch (error) {
-//       return rejectWithValue(error.message);
-//     }
-//   }
-// );

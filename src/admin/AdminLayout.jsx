@@ -23,9 +23,7 @@ function AdminLayout({ children }) {
         }`}
       >
         <AdminNavbar isSidebarOpen={isSidebarOpen} />
-        <div className="flex-grow overflow-y-auto max-w-full p-6 pt-20">
-          {children}
-        </div>
+        <div className="flex-grow overflow-y-auto p-6 pt-20">{children}</div>
       </div>
     </div>
   );

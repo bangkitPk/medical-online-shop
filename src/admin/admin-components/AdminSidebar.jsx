@@ -8,6 +8,8 @@ import {
   ShoppingCart,
   ChevronRight,
   LogOut,
+  AlignVerticalJustifyEnd,
+  Group,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/config/firebase.config";
@@ -44,9 +46,19 @@ export default function AdminSidebar({ isSidebarOpen, toggleSidebar }) {
       href: "/admin/customer",
     },
     {
+      name: "Produk",
+      icon: <AlignVerticalJustifyEnd size={15} className="mr-2" />,
+      href: "/admin/produk",
+    },
+    {
       name: "Toko",
       icon: <Store size={15} className="mr-2" />,
       href: "/admin/toko",
+    },
+    {
+      name: "Kategori Produk",
+      icon: <Group size={15} className="mr-2" />,
+      href: "/admin/kategori",
     },
     {
       name: "Pesanan",

@@ -192,6 +192,10 @@ import { logoutUser, setUser } from "./redux/slices/authSlice.js";
 import { fetchCart } from "./redux/thunks/cartThunk.js";
 import { fetchOrder } from "./redux/thunks/orderThunk.js";
 import { doc, getDoc } from "firebase/firestore";
+import DetailPesananPage from "./admin/admin-pages/DetailPesananPage.jsx";
+import ProductsPage from "./admin/admin-pages/ProductsPage.jsx";
+import AddProductPage from "./admin/admin-pages/AddProductPage.jsx";
+import KategoriPage from "./admin/admin-pages/KategoriPage.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -342,6 +346,46 @@ function App() {
               />
             }
           />
+
+          <Route
+            path="/admin/produk"
+            element={
+              <ProtectedRoute
+                element={
+                  <AdminLayout>
+                    <ProductsPage />
+                  </AdminLayout>
+                }
+                role="admin"
+              />
+            }
+          />
+          <Route
+            path="/add-product"
+            element={
+              <ProtectedRoute
+                element={
+                  <AdminLayout>
+                    <AddProductPage />
+                  </AdminLayout>
+                }
+                role="admin"
+              />
+            }
+          />
+          <Route
+            path="/admin/kategori"
+            element={
+              <ProtectedRoute
+                element={
+                  <AdminLayout>
+                    <KategoriPage />
+                  </AdminLayout>
+                }
+                role="admin"
+              />
+            }
+          />
           <Route
             path="/admin/toko"
             element={
@@ -362,6 +406,19 @@ function App() {
                 element={
                   <AdminLayout>
                     <PesananPage />
+                  </AdminLayout>
+                }
+                role="admin"
+              />
+            }
+          />
+          <Route
+            path="/detail-pesanan/:orderId"
+            element={
+              <ProtectedRoute
+                element={
+                  <AdminLayout>
+                    <DetailPesananPage />
                   </AdminLayout>
                 }
                 role="admin"
