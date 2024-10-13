@@ -21,6 +21,7 @@ export default function ProductFilterSidebar() {
   };
 
   const handleScroll = () => {
+    if (window.innerWidth < 640) return;
     const currentScrollPos = window.pageYOffset;
 
     if (prevScrollPos > currentScrollPos) {
@@ -52,7 +53,7 @@ export default function ProductFilterSidebar() {
 
   return (
     <div
-      className="sticky top-[15px] h-fit transition-all duration-300"
+      className="max-sm:relative sticky top-[15px] h-fit transition-all duration-300"
       style={{ top: `${sidebarTop}px` }}
     >
       <span className="font-bold">Filter</span>

@@ -32,7 +32,7 @@ export default function CartTable() {
   };
 
   return (
-    <div className="w-3/4 shadow-lg rounded-lg overflow-y-auto max-h-80">
+    <div className="max-sm:hidden w-3/4 shadow-lg rounded-lg overflow-y-auto max-h-80">
       <Table>
         <TableHeader>
           <TableRow>

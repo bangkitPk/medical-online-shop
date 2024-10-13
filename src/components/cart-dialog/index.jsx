@@ -21,7 +21,7 @@ export default function CartDialog({ inCart, onSubmit }) {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="w-full translate-y-full group-hover:translate-y-0 rounded-none transition-all ease-in duration-300"
+          className="max-sm:text-xs w-full translate-y-full group-hover:translate-y-0 rounded-none transition-all ease-in duration-300"
         >
           Tambah ke Keranjang
         </Button>

@@ -19,6 +19,7 @@ import {
 } from "@/redux/thunks/productThunks";
 import { useLocation } from "react-router-dom";
 import ProductCardSkeleton from "@/components/product-card-skeleton";
+import { Toaster } from "@/components/ui/toaster";
 
 function BelanjaPage() {
   const dispatch = useDispatch();
@@ -77,10 +78,10 @@ function BelanjaPage() {
   };
 
   return (
-    <div className="w-full pb-32 px-10 flex relative">
+    <div className="w-full pb-32 px-10 flex max-sm:flex-col max-sm:items-center relative min-h-screen">
       <ProductFilterSidebar />
-      <div className="flex flex-col w-full items-center gap-5">
-        <div className="ml-14 flex flex-wrap gap-5">
+      <div className="flex flex-col w-full items-center gap-5 max-sm:mt-10">
+        <div className="max-sm:w-screen max-sm:px-5 max-sm:ml-0 ml-14 flex flex-wrap max-sm:justify-center gap-5 ">
           {filteredProducts.category &&
             filteredProducts.items.map((product) => (
               <ProductCard
@@ -92,6 +93,7 @@ function BelanjaPage() {
                 stok={product.stok}
                 idToko={product.idToko}
                 toko={product.toko}
+                produkImg={product.produkImg}
               />
             ))}
           {searchedProducts.items.length > 0 &&
@@ -105,6 +107,7 @@ function BelanjaPage() {
                 stok={product.stok}
                 idToko={product.idToko}
                 toko={product.toko}
+                produkImg={product.produkImg}
               />
             ))}
           {products &&
@@ -118,6 +121,7 @@ function BelanjaPage() {
                 stok={product.stok}
                 idToko={product.idToko}
                 toko={product.toko}
+                produkImg={product.produkImg}
               />
             ))}
         </div>
@@ -137,6 +141,7 @@ function BelanjaPage() {
             </Button>
           )}
       </div>
+      <Toaster />
     </div>
   );
 }

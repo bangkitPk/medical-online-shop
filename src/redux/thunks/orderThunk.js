@@ -22,6 +22,8 @@ export const fetchOrder = createAsyncThunk(
         where("userId", "==", userId)
       );
 
+      console.log("Proses fetch order dengan....");
+      console.log("Id user: " + userId);
       const querySnapshot = await getDocs(userOrdersQuery);
       if (querySnapshot.empty) {
         console.log("Tidak ada order");
@@ -32,6 +34,7 @@ export const fetchOrder = createAsyncThunk(
         id: doc.id,
         ...doc.data(),
       }));
+      console.log("Proses fetch order selesai");
       return userOrders;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -50,8 +53,33 @@ export const addOrder = createAsyncThunk(
         createdAt: createdAtString,
       };
 
+      console.log("Proses manambah order....");
       const docRef = await addDoc(collection(db, "Order"), newOrder);
+      console.log("Proses manambah order selesai");
       return { id: docRef.id, ...newOrder };
+    } catch (error) {
+      console.error("Gagal menambah order:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateOrder = createAsyncThunk(
+  "order/updateOrder",
+  async ({ orderId, newStatus }, { rejectWithValue }) => {
+    try {
+      const orderRef = doc(db, "Order", orderId);
+      const updatedAtString = formatDate(new Date());
+
+      await updateDoc(orderRef, {
+        status: newStatus,
+        updatedAt: updatedAtString,
+      });
+
+      return {
+        orderId,
+        updatedData: { status: newStatus, updatedAt: updatedAtString },
+      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -63,10 +91,11 @@ export const addOrder = createAsyncThunk(
 //   "order/editOrder",
 //   async ({ orderId, updatedData }, { rejectWithValue }) => {
 //     try {
+//  const updatedAtString = formatDate(new Date());
 //       const orderRef = doc(db, "Order", orderId);
 //       await updateDoc(orderRef, {
 //         ...updatedData,
-//         updatedAt: Timestamp.now(),
+//         updatedAt: updatedAtString,
 //       });
 
 //       return { orderId, updatedData };

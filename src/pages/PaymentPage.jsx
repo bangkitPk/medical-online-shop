@@ -14,36 +14,31 @@ import { addOrder } from "@/redux/thunks/orderThunk";
 import { removeFromCart } from "@/redux/thunks/cartThunk";
 import { removeProduct } from "@/redux/slices/cartSlice";
 import { useToast } from "@/hooks/use-toast";
+import { sendOrderReceipt } from "@/services";
+import { MapPin } from "lucide-react";
 
 function PaymentPage() {
   const userCart = useSelector((state) => state.cart);
-  const userId = useSelector((state) => state.auth.user?.uid);
+  const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
-    namaLengkap: "",
-    alamat: {
-      provinsi: "",
-      "kota-kab": "",
-      detail: "",
-    },
-    nomorTelepon: "",
     metodePembayaran: "paypal",
   });
 
   const [isLocationMismatch, setIsLocationMismatch] = useState(false);
-  const { provinces, cities, fetchCities, loading, error } = useFetchRegions(); // Fetch regions
 
   useEffect(() => {
     if (userCart.selectedProducts.length === 0) {
       navigate("/keranjang");
       return;
     }
+    console.log(user);
 
     checkLocationMismatch();
-  }, [userCart.selectedProducts, formData.alamat["kota-kab"]]);
+  }, [userCart.selectedProducts, user.alamat["kota-kab"]]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,32 +48,8 @@ function PaymentPage() {
     }));
   };
 
-  const handleAlamatChange = (name, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      alamat: {
-        ...prevData.alamat,
-        [name]: value,
-      },
-    }));
-  };
-
-  // Handle province selection and trigger city fetch
-  const handleProvinsiChange = (provinceSelected) => {
-    let provinceId = provinces.find(
-      (provinsi) => provinsi.name === provinceSelected
-    )?.id;
-
-    handleAlamatChange("provinsi", provinceSelected);
-    fetchCities(provinceId);
-  };
-
-  const handleKotaChange = (cityId) => {
-    handleAlamatChange("kota-kab", cityId);
-  };
-
   const checkLocationMismatch = () => {
-    const buyerCity = formData.alamat["kota-kab"].toLowerCase();
+    const buyerCity = user.alamat["kota-kab"].toLowerCase();
     const hasMismatch = userCart.selectedProducts.some(
       (product) => product.toko.lokasi.toLowerCase() !== buyerCity
     );
@@ -89,11 +60,11 @@ function PaymentPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (
-      !formData.namaLengkap ||
-      !formData.alamat.provinsi ||
-      !formData.alamat["kota-kab"] ||
-      !formData.alamat.detail ||
-      !formData.nomorTelepon ||
+      !user.nama ||
+      !user.alamat.provinsi ||
+      !user.alamat["kota-kab"] ||
+      !user.alamat.detail ||
+      !user.nomorHP ||
       !formData.metodePembayaran
     ) {
       alert("Lengkapi semua data sebelum melanjutkan pembayaran.");
@@ -103,9 +74,9 @@ function PaymentPage() {
     const ordersPromises = userCart.selectedProducts.map((produk) => {
       const orderData = {
         produk,
-        userId: userId,
+        userId: user.uid,
         metodeBayar: formData.metodePembayaran,
-        alamatKirim: formData.alamat,
+        alamatKirim: user.alamat,
       };
 
       return dispatch(addOrder(orderData));
@@ -114,7 +85,7 @@ function PaymentPage() {
     // hapus produk yang dibeli dari keranjang
     const removeCartPromises = userCart.selectedProducts.map((product) => {
       return dispatch(
-        removeFromCart({ userId: userId, productId: product.id })
+        removeFromCart({ userId: user.uid, productId: product.id })
       );
     });
 
@@ -122,11 +93,33 @@ function PaymentPage() {
       await Promise.all(ordersPromises);
       await Promise.all(removeCartPromises);
 
+      console.log("pembelian berhasil");
+      navigate("/pesanan");
+
+      const orderProducts = userCart.selectedProducts.map((product) => ({
+        namaProduk: product.namaProduk,
+        harga: displayMoney(product.harga),
+        jumlah: product.jumlah,
+      }));
+
+      const orderData = {
+        userName: user.nama,
+        nomorHP: user.nomorHP,
+        products: orderProducts,
+        total: displayMoney(userCart.totalBiaya),
+        alamat: user.alamat,
+        paymentMethod: formData.metodePembayaran,
+        paypalID: user.paypalID,
+      };
+
+      const userEmail = user.email;
+
+      await sendOrderReceipt(orderData, userEmail); // kirim pdf laporan pembelian user
       toast({
         variant: "success",
         title: "Pembayaran anda berhasil.",
+        description: "Laporan pembelian telah dikirimkan ke emailmu",
       });
-      navigate("/pesanan");
     } catch (error) {
       console.error("Gagal menambahkan order:", error);
       alert("Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.");
@@ -134,91 +127,38 @@ function PaymentPage() {
   };
 
   return (
-    <div className="flex justify-center px-10 gap-10">
-      <div className="w-7/12 ">
-        <h2 className="font-extrabold">Informasi Pembayaran</h2>
+    <div className="max-sm:pt-5 flex max-sm:flex-col justify-center px-10 max-sm:px-0 gap-10 pb-10">
+      <div className="w-7/12 max-sm:w-full max-sm:px-10">
+        <h2 className="font-extrabold max-sm:mb-5 max-sm:text-center">
+          Informasi Pembayaran
+        </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* Nama Lengkap */}
-          <div className="flex flex-col">
-            <Label htmlFor="namaLengkap" className="font-semibold mb-1">
-              Nama Lengkap
-            </Label>
-            <Input
-              type="text"
-              id="namaLengkap"
-              name="namaLengkap"
-              value={formData.namaLengkap}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              required
-              placeholder="Masukkan nama lengkap"
-            />
-          </div>
 
           {/* Input Alamat Pengiriman */}
-          <Label className="font-semibold">Alamat Pengiriman</Label>
+          <div>
+            <Label className="font-semibold">Alamat Pengiriman</Label>
 
-          {/* Provinsi dan Kota */}
-          <div className="flex gap-10 ml-2">
-            <div className="flex flex-col">
-              <Label htmlFor="provinsi" className="font-semibold mb-1">
-                Provinsi
-              </Label>
-              <InputCombobox
-                data={provinces}
-                field="Provinsi"
-                onChange={handleProvinsiChange}
-              />
+            <div className="bg-white border rounded-sm p-3">
+              <div className="flex gap-3 mb-3">
+                <MapPin className="text-primary" />
+                <p className="font-bold">{user?.nama}</p>
+              </div>
+              <p>{user?.alamat.provinsi}</p>
+              <p>{user?.alamat["kota-kab"]}</p>
+              <p>{user?.alamat.detail}</p>
             </div>
-            <div className="flex flex-col">
-              <Label htmlFor="kota-kab" className="font-semibold mb-1">
-                Kota/Kabupaten
-              </Label>
-              <InputCombobox
-                data={cities}
-                field="Kabupaten/Kota"
-                onChange={handleKotaChange}
-              />
-            </div>
-          </div>
-
-          {/* Detail Alamat */}
-          <div className="flex flex-col ml-2">
-            <Label htmlFor="detail" className="font-semibold mb-1">
-              Detail Alamat (Jalan/Gang/Desa, dll.)
-            </Label>
-            <Input
-              type="text"
-              id="detail"
-              name="detail"
-              value={formData.alamat.detail}
-              onChange={(e) => handleAlamatChange("detail", e.target.value)}
-              className="border p-2 rounded"
-              required
-              placeholder="Masukkan detail alamat"
-            />
-          </div>
-
-          {/* Nomor Telepon */}
-          <div className="flex flex-col">
-            <Label htmlFor="nomorTelepon" className="font-semibold mb-1">
-              Nomor Telepon (HP)
-            </Label>
-            <Input
-              type="tel"
-              id="nomorTelepon"
-              name="nomorTelepon"
-              value={formData.nomorTelepon}
-              onChange={handleChange}
-              className="border p-2 rounded"
-              required
-              placeholder="Masukkan nomor telepon"
-            />
           </div>
 
           {/* Metode Pembayaran */}
           <div className="flex flex-col">
             <Label htmlFor="option-one">Metode Pembayaran</Label>
+            {!isLocationMismatch && (
+              <p className="text-primary font-bold text-sm">
+                Anda dapat membayar langsung di toko karena berada di kota yang
+                sama dengan toko.
+              </p>
+            )}
             <RadioGroup
               className="flex mt-3"
               value={formData.metodePembayaran}
@@ -240,8 +180,10 @@ function PaymentPage() {
           </div>
         </form>
       </div>
-      <div className="w-5/12 h-fit p-3 bg-secondary">
-        <h2 className="text-lg font-bold mb-5">Ringkasan Pembelian</h2>
+      <div className="w-5/12 h-fit p-3 bg-secondary max-sm:w-full">
+        <h2 className="text-lg font-bold mb-5 max-sm:text-center">
+          Ringkasan Pembelian
+        </h2>
         {/* Ringkasan Pembelian */}
         <PaymentProductList />
         <div className="flex justify-between font-bold mt-10">

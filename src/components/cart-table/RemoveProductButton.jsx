@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import { removeFromCart } from "@/redux/thunks/cartThunk";
+import { removeFromCart, updateCart } from "@/redux/thunks/cartThunk";
 import { Toaster } from "../ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { removeProduct } from "@/redux/slices/cartSlice";
@@ -10,10 +10,12 @@ export function RemoveProductButton({ product }) {
   const dispatch = useDispatch();
   const { toast } = useToast();
   const [toastId, setToastId] = useState(null);
+  const user = useSelector((state) => state.auth.user);
 
   const handleRemoveFromCart = () => {
     // Remove the product from the cart
     dispatch(removeProduct({ productId: product.id }));
+    dispatch(removeFromCart({ userId: user.uid, productId: product.id }));
 
     // Show the toast and store the toast ID
     const { id } = toast({
@@ -37,7 +39,7 @@ export function RemoveProductButton({ product }) {
   return (
     <>
       <Button
-        className="aspect-square w-1 h-7"
+        className="aspect-square w-1 h-7 text-primary"
         variant="ghost"
         onClick={handleRemoveFromCart}
       >

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addOrder, fetchOrder } from "../thunks/orderThunk";
+import { addOrder, updateOrder, fetchOrder } from "../thunks/orderThunk";
 
 const orderSlice = createSlice({
   name: "order",
@@ -11,6 +11,13 @@ const orderSlice = createSlice({
     error: null,
   },
   reducers: {
+    resetOrder(state) {
+      state.orders = [];
+      state.filteredOrders = [];
+      state.filterStatus = "Semua";
+      state.loading = false;
+      state.error = null;
+    },
     filterOrders: (state, action) => {
       let statusFilter = action.payload.toLowerCase();
       state.filterStatus = action.payload;
@@ -33,6 +40,7 @@ const orderSlice = createSlice({
       .addCase(fetchOrder.fulfilled, (state, action) => {
         state.loading = false;
         state.orders = action.payload;
+        state.filteredOrders = action.payload;
       })
       .addCase(fetchOrder.rejected, (state, action) => {
         state.loading = false;
@@ -48,6 +56,40 @@ const orderSlice = createSlice({
         state.loading = false;
       })
       .addCase(addOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(updateOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        const { orderId, updatedData } = action.payload;
+        const existingOrderIndex = state.orders.findIndex(
+          (order) => order.id === orderId
+        );
+
+        if (existingOrderIndex !== -1) {
+          state.orders[existingOrderIndex] = {
+            ...state.orders[existingOrderIndex],
+            ...updatedData,
+          };
+        }
+
+        const filteredOrderIndex = state.filteredOrders.findIndex(
+          (order) => order.id === orderId
+        );
+        if (filteredOrderIndex !== -1) {
+          state.filteredOrders[filteredOrderIndex] = {
+            ...state.filteredOrders[filteredOrderIndex],
+            ...updatedData,
+          };
+        }
+
+        state.loading = false;
+      })
+      .addCase(updateOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -77,5 +119,5 @@ const orderSlice = createSlice({
   },
 });
 
-export const { filterOrders } = orderSlice.actions;
+export const { resetOrder, filterOrders } = orderSlice.actions;
 export default orderSlice.reducer;

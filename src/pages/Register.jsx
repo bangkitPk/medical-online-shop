@@ -21,22 +21,31 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { formSchema } from "@/validation/registerFormValidation";
 import { z } from "zod";
+import { setUser } from "@/redux/slices/authSlice";
+import { useDispatch } from "react-redux";
+import { useFetchRegions } from "@/hooks/useFetchAlamat";
+import InputCombobox from "@/components/input-combobox";
 
 function RegisterPage() {
+  const { provinces, cities, fetchCities, loading, error } = useFetchRegions();
   const [formData, setFormData] = useState({
-    nama: "John Doe",
-    email: "johndoe@example.com",
-    password: "password123",
-    konfirmasiPassword: "password123",
-    gender: "Laki-laki",
-    alamat: "Jl. Contoh No.1",
-    kota: "Surabaya",
-    nomorHP: "08123456789",
-    paypalID: "johndoe@paypal.com",
+    nama: "",
+    email: "",
+    password: "",
+    konfirmasiPassword: "",
+    gender: "",
+    alamat: {
+      provinsi: "",
+      "kota-kab": "",
+      detail: "",
+    },
+    nomorHP: "",
+    paypalID: "",
   });
 
   const [isPasswordMatched, setIsPasswordMatched] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { toast } = useToast();
 
   const handleInputChange = (e) => {
@@ -74,6 +83,29 @@ function RegisterPage() {
     });
   };
 
+  const handleAlamatChange = (field, value) => {
+    setFormData({
+      ...formData,
+      alamat: {
+        ...formData.alamat,
+        [field]: value,
+      },
+    });
+  };
+
+  const handleProvinsiChange = (provinceSelected) => {
+    let provinceId = provinces.find(
+      (provinsi) => provinsi.name === provinceSelected
+    )?.id;
+
+    handleAlamatChange("provinsi", provinceSelected);
+    fetchCities(provinceId);
+  };
+
+  const handleKotaChange = (cityId) => {
+    handleAlamatChange("kota-kab", cityId);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -93,7 +125,7 @@ function RegisterPage() {
         return;
       }
 
-      // tambah user jika email belum ada di database
+      // daftar user jika email belum ada di database
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
@@ -106,16 +138,19 @@ function RegisterPage() {
         email: formData.email,
         gender: formData.gender,
         alamat: formData.alamat,
-        kota: formData.kota,
         nomorHP: formData.nomorHP,
         paypalID: formData.paypalID,
+        role: "customer", // set role untuk customer
       };
       if (user) {
         // simpan data user
         await setDoc(doc(db, "Users", user.uid), storedUserData);
+        dispatch(setUser({ uid: user.uid, ...storedUserData })); // set user state with user data
       }
+
       const authInfo = {
         userID: user.uid,
+        role: "customer",
         isAuth: true,
       };
       localStorage.setItem("auth", JSON.stringify(authInfo));
@@ -148,9 +183,9 @@ function RegisterPage() {
   };
 
   return (
-    <main className="flex w-screen h-screen relative overflow-hidden">
+    <main className="flex max-sm:pt-10 max-sm:bg-secondary w-screen h-screen relative overflow-hidden max-sm:overflow-y-auto">
       <div className="bg-gradient-to-r from-secondary to-[#a0391d] w-40 h-40 rounded-full absolute z-10 -top-8 -left-10"></div>
-      <div className="bg-secondary w-1/2 h-full relative flex flex-col items-center justify-center z-0">
+      <div className="bg-secondary max-sm:hidden w-1/2 h-full relative flex flex-col items-center justify-center z-0">
         <div className="bg-[#ffc1ad] opacity-50 w-80 h-80 rounded-full absolute z-0 top-20"></div>
 
         <img
@@ -160,15 +195,15 @@ function RegisterPage() {
         />
       </div>
       <div className="bg-gradient-to-r from-secondary to-primary w-28 h-28 rounded-full absolute -bottom-16 left-1/2 -translate-x-2/3 opacity-50"></div>
-      <div className="w-1/2 h-full flex justify-center items-center">
+      <div className="max-sm:w-full max-sm:z-50  w-1/2 h-full flex justify-center items-center">
         <div className="w-3/4 flex flex-col items-center">
           <img src={logo} className="w-14 mb-5" alt="logo" />
           <h1 className="text-3xl font-bold mb-5">Daftar Akun Baru</h1>
 
           {/* FORM LOGIN */}
           <form className="space-y-3 w-full" onSubmit={handleSubmit}>
-            <div className="flex gap-10 justify-center">
-              <div id="left-form" className="space-y-3">
+            <div className="flex max-sm:flex-col max-sm:gap-3 gap-10 justify-center">
+              <div id="left-form" className="space-y-3 w-1/2">
                 <div>
                   <Label>Nama</Label>
                   <Input
@@ -221,6 +256,15 @@ function RegisterPage() {
                   />
                 </div>
                 <div>
+                  <Label>Nomor HP</Label>
+                  <Input
+                    type="text"
+                    name="nomorHP"
+                    value={formData.nomorHP}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
                   <Label htmlFor="option-one">Gender</Label>
                   <RadioGroup
                     defaultValue="option-one"
@@ -241,43 +285,33 @@ function RegisterPage() {
               </div>
               <div id="right-form" className="space-y-3">
                 <div>
-                  <Label>Alamat</Label>
-                  <Input
-                    type="text"
-                    name="alamat"
-                    value={formData.alamat}
-                    onChange={handleInputChange}
+                  <Label>Alamat (Provinsi)</Label>
+                  <InputCombobox
+                    data={provinces}
+                    field="Provinsi"
+                    onChange={handleProvinsiChange}
                   />
-                </div>
-                <div className="relative">
-                  <Label>Kota</Label>
-                  <Input
-                    type="text"
-                    name="kota"
-                    value={formData.kota}
-                    onChange={handleInputChange}
-                  />
-                  {/* <div
-                    className={`${
-                      !formData.kota && "hidden"
-                    } animate-slide-up transition-all bg-gray-400 rounded-md w-full h-40 absolute overflow-scroll`}
-                  >
-                    {cities.results ? (
-                      cities.results.map((city, index) => (
-                        <p key={index}>{city.asciiname}</p>
-                      ))
-                    ) : (
-                      <p>No cities available</p>
-                    )}
-                  </div> */}
                 </div>
                 <div>
-                  <Label>Nomor HP</Label>
+                  <Label>Alamat (Kota)</Label>
+                  <InputCombobox
+                    data={cities}
+                    field="Kabupaten/Kota"
+                    onChange={handleKotaChange}
+                  />
+                </div>
+                <div>
+                  <Label>Detail Alamat (Jalan/Gang/Desa, dll.)</Label>
                   <Input
                     type="text"
-                    name="nomorHP"
-                    value={formData.nomorHP}
-                    onChange={handleInputChange}
+                    id="detail"
+                    name="detail"
+                    value={formData.alamat.detail}
+                    onChange={(e) =>
+                      handleAlamatChange("detail", e.target.value)
+                    }
+                    required
+                    className="w-[200px]"
                   />
                 </div>
                 <div>
@@ -287,6 +321,7 @@ function RegisterPage() {
                     name="paypalID"
                     value={formData.paypalID}
                     onChange={handleInputChange}
+                    className="w-[200px]"
                   />
                 </div>
               </div>

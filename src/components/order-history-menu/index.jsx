@@ -12,12 +12,12 @@ import { filterOrders } from "@/redux/slices/orderSlice";
 
 export default function OrderHistoryMenu() {
   const { orders, loading } = useSelector((state) => state.order);
-  const [activeItem, setActiveItem] = useState("Semua");
+  const [activeItem, setActiveItem] = useState("semua");
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!loading && orders.length > 0) {
-      dispatch(filterOrders("Semua"));
+      dispatch(filterOrders("semua"));
     }
   }, [loading, orders, dispatch]);
 
@@ -27,70 +27,70 @@ export default function OrderHistoryMenu() {
   };
 
   return (
-    <NavigationMenu className="bg-white text-lg">
-      <NavigationMenuList>
+    <NavigationMenu className="bg-white text-lg max-sm:text-base max-sm:w-full max-sm:overflow-x-auto scrollbar-hide">
+      <NavigationMenuList className="max-sm:w-max max-sm:ml-[20rem]">
         <NavigationMenuItem
           className={`hover:text-primary px-5 py-2 ${
-            activeItem === "Semua"
+            activeItem === "semua"
               ? "border-b-2 border-primary text-primary"
               : ""
           }`}
-          onClick={() => handleItemClick("Semua")}
+          onClick={() => handleItemClick("semua")}
         >
           <NavigationMenuLink>Semua</NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem
           className={`hover:text-primary px-5 py-2 ${
-            activeItem === "Belum Dibayar"
+            activeItem === "belum dibayar"
               ? "border-b-2 border-primary text-primary"
               : ""
           }`}
-          onClick={() => handleItemClick("Belum Dibayar")}
+          onClick={() => handleItemClick("belum dibayar")}
         >
           <NavigationMenuLink>Belum Dibayar</NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem
           className={`hover:text-primary px-5 py-2 ${
-            activeItem === "Diproses"
+            activeItem === "diproses"
               ? "border-b-2 border-primary text-primary"
               : ""
           }`}
-          onClick={() => handleItemClick("Diproses")}
+          onClick={() => handleItemClick("diproses")}
         >
           <NavigationMenuLink>Diproses</NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem
           className={`hover:text-primary px-5 py-2 ${
-            activeItem === "Dikirim"
+            activeItem === "dikirim"
               ? "border-b-2 border-primary text-primary"
               : ""
           }`}
-          onClick={() => handleItemClick("Dikirim")}
+          onClick={() => handleItemClick("dikirim")}
         >
           <NavigationMenuLink>Dikirim</NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem
           className={`hover:text-primary px-5 py-2 ${
-            activeItem === "Selesai"
+            activeItem === "selesai"
               ? "border-b-2 border-primary text-primary"
               : ""
           }`}
-          onClick={() => handleItemClick("Selesai")}
+          onClick={() => handleItemClick("selesai")}
         >
           <NavigationMenuLink>Selesai</NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem
           className={`hover:text-primary px-5 py-2 ${
-            activeItem === "Dibatalkan"
+            activeItem === "dibatalkan"
               ? "border-b-2 border-primary text-primary"
               : ""
           }`}
-          onClick={() => handleItemClick("Dibatalkan")}
+          onClick={() => handleItemClick("dibatalkan")}
         >
           <NavigationMenuLink>Dibatalkan</NavigationMenuLink>
         </NavigationMenuItem>

@@ -19,7 +19,7 @@ export default function ProductCard({
   stok,
   idToko,
   toko,
-  kategori,
+  produkImg = heroImage,
 }) {
   const { toast } = useToast();
   const dispatch = useDispatch();
@@ -104,8 +104,7 @@ export default function ProductCard({
   };
 
   return (
-    <div className="w-full max-w-52 cursor-pointer group">
-      <Toaster />
+    <div className="w-full max-sm:w-5/12 max-w-52 cursor-pointer group">
       <div
         className={`${
           inCart && "border-black"
@@ -113,7 +112,7 @@ export default function ProductCard({
       >
         <div className="bg-muted w-full group-hover:scale-y-90 origin-top transition-all ease-in-out duration-300 ">
           <img
-            src={heroImage}
+            src={produkImg}
             alt="Product Image"
             // width={600}
             // height={400}
@@ -127,11 +126,15 @@ export default function ProductCard({
           />
         )}
         <div className="p-2 translate-y-1/3 group-hover:translate-y-0 transition-all duration-300 ease-in">
-          <h3 className="font-semibold truncate">{namaProduk}</h3>
+          <h3 className="font-semibold truncate max-sm:text-sm">
+            {namaProduk}
+          </h3>
           <p className="text-gray-500 dark:text-gray-400 text-xs">
             {toko.namaToko}
           </p>
-          <span className="font-bold">{displayMoney(harga)}</span>
+          <span className="font-bold max-sm:text-sm">
+            {displayMoney(harga)}
+          </span>
         </div>
         <div className="flex flex-col items-center justify-between gap-2 mt-2">
           {/* <Button className="w-full" variant="secondary">
@@ -142,7 +145,7 @@ export default function ProductCard({
           ) : (
             <Button
               onClick={handleRemoveFromCart}
-              className="w-full translate-y-full group-hover:translate-y-0 rounded-none transition-all ease-in duration-300"
+              className="max-sm:text-xs w-full translate-y-full group-hover:translate-y-0 rounded-none transition-all ease-in duration-300"
             >
               Hapus dari Keranjang
             </Button>

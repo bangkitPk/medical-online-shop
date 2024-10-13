@@ -42,7 +42,7 @@ export function SearchInput() {
   };
 
   return (
-    <div className="flex h-10 w-1/2 items-center rounded-2xl border border-ring bg-white pl-3 text-sm ring-offset-u focus-within:ring-1 focus-within:ring-primary">
+    <div className="flex h-10 w-1/2 max-sm:w-3/4 max-sm:ml-3 items-center rounded-2xl border border-ring bg-white pl-3 text-sm ring-offset-u focus-within:ring-1 focus-within:ring-primary">
       <Search />
       <Input
         value={searchKey}

@@ -3,12 +3,8 @@ import { useSelector } from "react-redux";
 
 export default function PaymentProductList() {
   const userCart = useSelector((state) => state.cart);
-  console.log("product: ");
-  console.log(userCart.products);
-  console.log("selected product: ");
-  console.log(userCart.selectedProducts);
   return (
-    <ul>
+    <ul className="max-h-56 overflow-y-auto scrollbar-hide bg-red-300">
       {userCart?.selectedProducts.map((product) => (
         <li
           className="p-2 text-sm w-full flex justify-between items-center"

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/config/firebase.config";
+import { auth, db } from "@/config/firebase.config";
+import { doc, getDoc } from "firebase/firestore";
 
 // Async action Login
 export const loginUser = createAsyncThunk(
@@ -14,12 +15,11 @@ export const loginUser = createAsyncThunk(
       );
 
       const { user } = userCredential;
+      const userDoc = await getDoc(doc(db, "Users", user.uid));
       const userData = {
         uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        phoneNumber: user.phoneNumber,
         photoURL: user.photoURL,
+        ...userDoc.data(),
       };
 
       return userData;

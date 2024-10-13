@@ -41,14 +41,27 @@ function LoginPage() {
     e.preventDefault();
     dispatch(loginUser(formData))
       .unwrap()
-      .then(() => navigate("/"))
+      .then((userData) => {
+        // Store user ID and role in local storage
+        const authInfo = {
+          userID: userData.uid,
+          role: userData.role,
+          isAuth: true,
+        };
+        localStorage.setItem("auth", JSON.stringify(authInfo));
+        if (userData.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      })
       .catch((err) => console.error("Login failed:", err));
   };
 
   return (
-    <main className="flex w-screen h-screen relative overflow-hidden">
+    <main className="flex max-sm:pt-10 max-sm:bg-secondary w-screen h-screen relative overflow-hidden">
       <div className="bg-gradient-to-r from-secondary to-[#a0391d] w-40 h-40 rounded-full absolute z-10 -top-8 -left-10"></div>
-      <div className="bg-secondary w-1/2 h-full relative flex flex-col items-center justify-center z-0">
+      <div className="bg-secondary  max-sm:hidden w-1/2 h-full relative flex flex-col items-center justify-center z-0">
         <div className="bg-[#ffc1ad] opacity-50 w-80 h-80 rounded-full absolute z-0 top-20"></div>
 
         <img
@@ -58,10 +71,12 @@ function LoginPage() {
         />
       </div>
       <div className="bg-gradient-to-r from-secondary to-primary w-28 h-28 rounded-full absolute -bottom-16 left-1/2 -translate-x-2/3 opacity-50"></div>
-      <div className="w-1/2 h-full flex justify-center items-center">
-        <div className="w-1/2  flex flex-col items-center">
+      <div className="max-sm:w-full max-sm:z-50  w-1/2 h-full flex justify-center items-center">
+        <div className="w-1/2 max-sm:w-3/4 flex flex-col items-center">
           <img src={logo} className="w-14 mb-10" alt="logo" />
-          <h1 className="text-3xl font-bold mb-10">Masuk ke Akun Anda</h1>
+          <h1 className="max-sm:text-center max-sm:text-xl text-3xl font-bold mb-10">
+            Masuk ke Akun Anda
+          </h1>
 
           {/* FORM LOGIN */}
           <form className="space-y-8 w-full" onSubmit={handleSubmit}>

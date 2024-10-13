@@ -52,7 +52,7 @@ const cartSlice = createSlice({
       const existingProduct = state.products.find(
         (product) => product.id === productId
       );
-      const isProductSelected = state.selectedProducts.find(
+      const productSelected = state.selectedProducts.find(
         (product) => product.id === productId
       );
 
@@ -60,8 +60,10 @@ const cartSlice = createSlice({
       if (existingProduct) {
         existingProduct.jumlah += 1;
         existingProduct.total += existingProduct.harga;
-        if (isProductSelected) {
+        if (productSelected) {
           // jika produk dipilih, update totalBiaya
+          productSelected.jumlah += 1;
+          productSelected.total += productSelected.harga;
           state.totalBiaya += existingProduct.harga;
         }
       }
@@ -73,7 +75,7 @@ const cartSlice = createSlice({
       const existingProduct = state.products.find(
         (product) => product.id === productId
       );
-      const isProductSelected = state.selectedProducts.find(
+      const productSelected = state.selectedProducts.find(
         (product) => product.id === productId
       );
 
@@ -81,8 +83,10 @@ const cartSlice = createSlice({
       if (existingProduct && existingProduct.jumlah > 1) {
         existingProduct.jumlah -= 1;
         existingProduct.total -= existingProduct.harga;
-        if (isProductSelected) {
+        if (productSelected) {
           // jika produk dipilih, update totalBiaya
+          productSelected.jumlah -= 1;
+          productSelected.total -= productSelected.harga;
           state.totalBiaya -= existingProduct.harga;
         }
       }

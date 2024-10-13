@@ -1,6 +1,6 @@
 import logo from "@/assets/images/logo.svg";
 import { SearchInput } from "./SearchInput";
-import { User, LogOut, ShoppingCart, CreditCard } from "lucide-react";
+import { User, LogOut, ShoppingCart, CreditCard, Menu } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { resetOrder } from "@/redux/slices/orderSlice";
 
 function Navbar() {
   const [prevScrollPos, setPrevScrollPos] = useState(window.pageYOffset);
@@ -68,7 +69,7 @@ function Navbar() {
         "fill-mode-forwards",
         "fixed",
         "top-0",
-        "z-50",
+        "z-40",
         "shadow-md",
         "py-3"
       );
@@ -78,7 +79,7 @@ function Navbar() {
       navbar.current.classList.add(
         "fixed",
         "top-0",
-        "z-50",
+        "z-40",
         "shadow-md",
         "animate-slide-down",
         "fill-mode-forwards",
@@ -108,8 +109,10 @@ function Navbar() {
 
     try {
       await auth.signOut();
+      localStorage.removeItem("auth");
       dispatch(logoutUser());
       dispatch(resetCart());
+      dispatch(resetOrder());
     } catch (error) {
       console.error(error.message);
     }
@@ -118,9 +121,32 @@ function Navbar() {
   return (
     <nav
       ref={navbar}
-      className={`flex items-center justify-between w-full px-10 py-7 bg-background`}
+      className={`flex items-center justify-between w-full max-sm:px-5 px-10 py-7 bg-background`}
     >
-      <img src={logo} className="w-10" alt="logo" />
+      <div className="sm:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Menu />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {navLinks.map((link) => (
+              <DropdownMenuItem>
+                <NavLink
+                  key={link.key}
+                  to={link.path}
+                  style={({ isActive }) => {
+                    return isActive ? { color: "plum" } : {};
+                  }}
+                  className="hover:bg-accent px-3 py-3 sm:hidden w-full"
+                >
+                  {link.text}
+                </NavLink>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <img src={logo} className="w-10 max-sm:hidden" alt="logo" />
       {navLinks.map((link) => (
         <NavLink
           key={link.key}
@@ -128,13 +154,13 @@ function Navbar() {
           style={({ isActive }) => {
             return isActive ? { color: "plum" } : {};
           }}
-          className="hover:bg-accent px-3 py-3"
+          className="hover:bg-accent px-3 py-3 max-sm:hidden"
         >
           {link.text}
         </NavLink>
       ))}
       <SearchInput />
-      <NavLink to="/keranjang" className="relative hover:bg-accent px-3 py-3">
+      <NavLink to="/keranjang" className="relative hover:bg-accent px-3 py-3 ">
         {user && cartProducts.length > 0 ? (
           <>
             <span className="bg-primary w-4 h-4 rounded-full text-xs flex items-center justify-center text-white absolute -top-1 -right-1">
@@ -187,20 +213,20 @@ function Navbar() {
             </Button> */}
           </>
         ) : (
-          <>
+          <div className="max-sm:flex max-sm:flex-col">
             <NavLink
               to="/register"
-              className="px-3 py-2 rounded-md hover:bg-gray-200"
+              className="px-3 py-2 max-sm:p-1 rounded-md hover:bg-gray-200"
             >
               Daftar
             </NavLink>
             <NavLink
               to="/login"
-              className="px-3 py-2 rounded-md hover:bg-gray-200"
+              className="px-3 py-2 max-sm:p-1 rounded-md hover:bg-gray-200"
             >
               Masuk
             </NavLink>
-          </>
+          </div>
         )}
       </div>
     </nav>

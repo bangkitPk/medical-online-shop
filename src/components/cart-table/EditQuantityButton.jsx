@@ -21,9 +21,9 @@ export function EditQuantityButton({ product }) {
   };
 
   return (
-    <div className="flex gap-2 items-center w-full justify-center">
+    <div className="flex gap-2 items-center w-full max-sm:w-fit justify-center">
       <Button
-        className="aspect-square w-1 h-7"
+        className="aspect-square w-1 h-7 text-primary"
         variant="ghost"
         onClick={handleDecreaseQuantity}
       >
@@ -31,7 +31,7 @@ export function EditQuantityButton({ product }) {
       </Button>
       <span>{product.jumlah}</span>
       <Button
-        className="aspect-square w-1 h-7"
+        className="aspect-square w-1 h-7 text-primary"
         variant="ghost"
         onClick={handleAddQuantity}
       >

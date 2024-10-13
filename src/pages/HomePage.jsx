@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useRef, useState } from "react";
+import Footer from "@/components/footer";
 
 function HomePage() {
   const autoplay = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }));
@@ -38,10 +39,10 @@ function HomePage() {
 
   return (
     <main>
-      <header className="w-full flex justify-center">
+      <header className="w-full max-sm:block flex justify-center">
         <Carousel
           plugins={[autoplay.current]}
-          className="w-3/4 relative cursor-pointer"
+          className="max-sm:w-full w-3/4 relative cursor-pointer"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           autoplayref={autoplay}
@@ -49,9 +50,9 @@ function HomePage() {
           <CarouselContent>
             {headerTexts.map((text, index) => (
               <CarouselItem key={index}>
-                <div className="bg-[#F2F0F1] h-[.5vh] flex items-center gap-20 py-44">
+                <div className="bg-[#F2F0F1] h-[.5vh] flex items-center max-sm:gap-10 gap-20 py-44">
                   <img src={headerImages[index]} className="w-5/12" />
-                  <h1 className="text-5xl w-1/2 font-bold text-primary">
+                  <h1 className="max-sm:text-2xl text-5xl w-1/2 font-bold text-primary">
                     {text}
                   </h1>
                 </div>
@@ -73,6 +74,24 @@ function HomePage() {
           />
         </Carousel>
       </header>
+      <section className="w-full flex justify-center my-24">
+        <div className="w-3/4">
+          <h2 className="text-primary font-bold text-3xl mb-5">Tentang Kami</h2>
+          <p>
+            <span className="text-primary font-bold texlg">MedCareShop</span>{" "}
+            adalah platform belanja online yang menyediakan berbagai alat
+            kesehatan berkualitas untuk memenuhi kebutuhan medis Anda, baik
+            untuk penggunaan pribadi maupun profesional. Kami berkomitmen untuk
+            menyediakan produk-produk terpercaya dan terbaru, mulai dari
+            peralatan diagnostik, perlengkapan medis, hingga kebutuhan
+            sehari-hari untuk perawatan kesehatan di rumah. Dengan layanan yang
+            mudah, aman, dan cepat, kami hadir untuk membantu Anda menjaga
+            kesehatan dengan produk yang terjamin keasliannya dan harga yang
+            bersaing. MedCareShop, solusi belanja alat kesehatan yang dapat
+            diandalkan, kapan saja dan di mana saja.
+          </p>
+        </div>
+      </section>
     </main>
   );
 }

@@ -1,3 +1,5 @@
+import CartNavBottom from "@/components/cart-page-mobile/CartNavBottom";
+import CartProductList from "@/components/cart-page-mobile/CartProductList";
 import CartTable from "@/components/cart-table";
 import { Button } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
@@ -71,15 +73,21 @@ function CartPage() {
     }
   }
   return (
-    <div className="py-10 px-10">
-      <Toaster />
-      <h1 className="text-3xl font-black">Keranjang Belanja</h1>
-      <p className="mb-10">
+    <div className="pb-24 pt-5 px-10 max-sm:px-0 max-sm:min-h-screen max-sm:pb-0">
+      <h1 className="max-sm:text-xl max-sm:text-center text-3xl font-black">
+        Keranjang Belanja
+      </h1>
+      <p className="mb-10 max-sm:text-center">
         <b>{cart.products.length} produk</b> di keranjang Anda
       </p>
-      <div className="flex gap-10 items-start">
+      <div className="max-sm:flex-col flex gap-10 items-start">
+        {/* for mobile screen */}
+        <CartProductList />
+        <CartNavBottom onCheckout={handleCheckout} />
+
+        {/* for big screen */}
         <CartTable />
-        <div className="rounded-lg bg-secondary p-3 w-64">
+        <div className="rounded-lg bg-secondary p-3 w-64 max-sm:hidden">
           <h2 className="text-lg font-bold mb-5">Total Belanja</h2>
           <div className="flex justify-between">
             <p>Subtotal</p>
@@ -100,8 +108,7 @@ function CartPage() {
           </div>
         </div>
       </div>
-      {console.log(cart.products)}
-      <Toaster />
+      <Toaster className="z-50" />
     </div>
   );
 }
