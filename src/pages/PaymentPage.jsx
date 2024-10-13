@@ -38,7 +38,7 @@ function PaymentPage() {
     console.log(user);
 
     checkLocationMismatch();
-  }, [userCart.selectedProducts, user.alamat["kota-kab"]]);
+  }, [userCart.selectedProducts, user?.alamat["kota-kab"]]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

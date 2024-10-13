@@ -183,7 +183,7 @@ function RegisterPage() {
   };
 
   return (
-    <main className="flex max-sm:pt-10 max-sm:bg-secondary w-screen h-screen relative overflow-hidden max-sm:overflow-y-auto">
+    <main className="flex max-sm:pt-20 max-sm:bg-secondary w-screen h-screen relative overflow-hidden max-sm:overflow-y-auto">
       <div className="bg-gradient-to-r from-secondary to-[#a0391d] w-40 h-40 rounded-full absolute z-10 -top-8 -left-10"></div>
       <div className="bg-secondary max-sm:hidden w-1/2 h-full relative flex flex-col items-center justify-center z-0">
         <div className="bg-[#ffc1ad] opacity-50 w-80 h-80 rounded-full absolute z-0 top-20"></div>
@@ -203,7 +203,7 @@ function RegisterPage() {
           {/* FORM LOGIN */}
           <form className="space-y-3 w-full" onSubmit={handleSubmit}>
             <div className="flex max-sm:flex-col max-sm:gap-3 gap-10 justify-center">
-              <div id="left-form" className="space-y-3 w-1/2">
+              <div id="left-form" className="space-y-3 w-1/2 max-sm:w-full">
                 <div>
                   <Label>Nama</Label>
                   <Input
@@ -311,7 +311,7 @@ function RegisterPage() {
                       handleAlamatChange("detail", e.target.value)
                     }
                     required
-                    className="w-[200px]"
+                    className="w-[200px] max-sm:w-full"
                   />
                 </div>
                 <div>
@@ -321,7 +321,7 @@ function RegisterPage() {
                     name="paypalID"
                     value={formData.paypalID}
                     onChange={handleInputChange}
-                    className="w-[200px]"
+                    className="w-[200px] max-sm:w-full"
                   />
                 </div>
               </div>
